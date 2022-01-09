@@ -1,5 +1,6 @@
 module.exports = (mongoose, config)=>{
     try{
+        console.log(process.env.MONGO_URL)
         mongoose.connect(process.env.MONGO_URL,
             {
                 useUnifiedTopology: true,

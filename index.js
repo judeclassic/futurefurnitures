@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const cors = require('cors');
 const mongoose = require("mongoose");
 const dotenv = require('dotenv');
 const server = require('http').createServer(app);
@@ -9,6 +10,8 @@ if (process.env.ENV == 'production'){
     console.log("yeah")
     dotenv.config({ path: "./.env" });
 }
+
+app.use(cors());
 
 require('./src/lib/connectDB')(mongoose, {
     name: 'Future Furnitures',
@@ -23,7 +26,7 @@ app.use(express.urlencoded({
 }));
 app.use(express.json());
 
-app.use("/api/user/", userRoute);
+app.use("/api/email/", userRoute);
 
 
 var PORT = process.env.PORT || 6000;
