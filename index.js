@@ -32,5 +32,5 @@ app.use("/api/email/", userRoute);
 var PORT = process.env.PORT || 6000;
 
 server.listen(PORT, ()=>{
-    console.log(`Running On Port ${PORT}`);
+    console.log(`Running on Port ${PORT}`);
 });
