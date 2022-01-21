@@ -29,7 +29,7 @@ router.post("/subscribe", (req, res, next) => {
     
                   res.statusCode = 200;
                   res.setHeader("Content-Type", "application/json");
-                  emailJs.sendForm('gmail', 'template_qhcze8t', emailJson, 'service_bvckvwc')
+                  emailJs.sendForm('gmail', 'template_qhcze8t', req.body.email, 'service_bvckvwc', emailJson)
                   .then((result) => {
                     res.json("Subscription Successful");
                   }, (error) => {
