@@ -1,6 +1,10 @@
 const express = require('express');
+const emailJs = require('@emailjs/browser');
 const {Subscriptions} = require('../models/subscriptions');
 const router = express.Router();
+
+emailJs.init('user_LF1IVOx1lXE5OZXFZgtxG');
+
 
 router.post("/subscribe", (req, res, next) => {
     if (req.body) {
@@ -17,11 +21,20 @@ router.post("/subscribe", (req, res, next) => {
             Subscriptions.create(req.body)
               .then(
                 (user) => {
-                  console.log("Email has been Added ", user);
+                  const emailJson = {
+                    from_name: "House Interior",
+                    to_name: req.body.name,
+                    message: "Welcome to future furnitures"
+                  };
     
                   res.statusCode = 200;
                   res.setHeader("Content-Type", "application/json");
-                  res.json("Subscription Successful");
+                  emailJs.sendForm('gmail', 'template_qhcze8t', emailJson, 'service_bvckvwc')
+                  .then((result) => {
+                    res.json("Subscription Successful");
+                  }, (error) => {
+                      console.log(error.text);
+                  });
                 },
                 (err) => next(err)
               )

@@ -7,7 +7,6 @@ const server = require('http').createServer(app);
 
 if (process.env.ENV == 'production'){
 }else{
-    console.log("yeah")
     dotenv.config({ path: "./.env" });
 }
 
@@ -24,6 +23,7 @@ app.use(express.static('public'));
 app.use(express.urlencoded({
     extended: true
 }));
+
 app.use(express.json());
 
 app.use("/api/email/", userRoute);
