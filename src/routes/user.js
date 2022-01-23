@@ -39,7 +39,7 @@ router.post("/subscribe", (req, res, next) => {
                 },
                 (err, result) => {
                   if (err) {
-
+                    return res.status(401).json(err);
                   }
                   Subscriptions.create({
                     email: req.body.email,
@@ -49,7 +49,7 @@ router.post("/subscribe", (req, res, next) => {
                       (user) => {
                         res.statusCode = 200;
                         res.setHeader("Content-Type", "application/json");
-                        res.json("Subscription Successful");
+                        res.status(200).json("Subscription Successful");
                       },
                       (err) => next(err)
                     )
@@ -60,9 +60,7 @@ router.post("/subscribe", (req, res, next) => {
         }
       );
     } else {
-      res.status(400).json({
-        message: "Missing Parameter",
-      });
+      res.status(400).json("Missing Parameter");
     }
   });
 
