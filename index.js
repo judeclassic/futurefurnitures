@@ -12,7 +12,7 @@ if (process.env.ENV == 'production'){
 
 app.use(cors());
 
-require('./src/lib/connectDB')(mongoose, {
+require('./src/lib/connect_DB')(mongoose, {
     name: 'Future Furnitures',
 });
 
