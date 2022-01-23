@@ -1,4 +1,5 @@
 module.exports = (mongoose, config)=>{
+    
     try{
         mongoose.connect(process.env.MONGO_URL,
             {

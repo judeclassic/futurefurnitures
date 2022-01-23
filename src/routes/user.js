@@ -1,10 +1,7 @@
 const express = require('express');
-const emailJs = require('@emailjs/browser');
 const {Subscriptions} = require('../models/subscriptions');
 const router = express.Router();
-
-emailJs.init('user_LF1IVOx1lXE5OZXFZgtxG');
-
+const emailHandler = require('../lib/emailHandler');
 
 router.post("/subscribe", (req, res, next) => {
     if (req.body) {
@@ -18,27 +15,47 @@ router.post("/subscribe", (req, res, next) => {
               .status(400)
               .json("Email " + req.body.email + ' is already subscribed');
           }else{
-            Subscriptions.create(req.body)
-              .then(
-                (user) => {
-                  const emailJson = {
-                    from_name: "House Interior",
-                    to_name: req.body.name,
-                    message: "Welcome to future furnitures"
-                  };
-    
-                  res.statusCode = 200;
-                  res.setHeader("Content-Type", "application/json");
-                  emailJs.sendForm('gmail', 'template_qhcze8t', req.body.email, 'service_bvckvwc', emailJson)
-                  .then((result) => {
-                    res.json("Subscription Successful");
-                  }, (error) => {
-                      console.log(error.text);
-                  });
+              emailHandler.send({
+                    "Messages":[
+                        {
+                            "From": {
+                                "Email": "justclassic24@gmail.com",
+                                "Name": "Future Furnitures"
+                            },
+                            "To": [
+                                {
+                                    "Email": req.body.email,
+                                    "Name": req.body.name
+                                }
+                            ],
+                            "TemplateID": 3515504,
+                            "TemplateLanguage": true,
+                            "Subject": "Welcome to Future Furniture, Get to build your furniture",
+                            "Variables": {
+                                "name": req.body.name
+                            }
+                        }
+                    ]
                 },
-                (err) => next(err)
-              )
-              .catch((err) => next(err));
+                (err, result) => {
+                  if (err) {
+
+                  }
+                  Subscriptions.create({
+                    email: req.body.email,
+                    name: req.body.name
+                  })
+                    .then(
+                      (user) => {
+                        res.statusCode = 200;
+                        res.setHeader("Content-Type", "application/json");
+                        res.json("Subscription Successful");
+                      },
+                      (err) => next(err)
+                    )
+                    .catch((err) => next(err));
+                }
+              );
           }
         }
       );

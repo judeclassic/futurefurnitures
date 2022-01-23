@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const Subscriptions = mongoose.model("Subscriptions", mongoose.Schema({
+const Subscriptions = mongoose.model("Subscription", mongoose.Schema({
     'email': {
         required: true,
         type: String,
