@@ -17,7 +17,7 @@ exports.subscribe = (req, res, next) => {
                     "Messages":[
                         {
                             "From": {
-                                "Email": "justclassic24@gmail.com",
+                                "Email": "mail@thehouseinterior.com",
                                 "Name": "Future Furnitures"
                             },
                             "To": [
@@ -30,7 +30,7 @@ exports.subscribe = (req, res, next) => {
                             "TemplateLanguage": true,
                             "Subject": "Welcome to Future Furniture, Get to build your furniture",
                             "Variables": {
-                                "name": req.body.name
+                                "name": "Friend"
                             }
                         }
                     ]
