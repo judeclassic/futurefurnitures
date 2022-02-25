@@ -2,20 +2,18 @@ const mongoose = require("mongoose");
 
 //User Schema
 
-const User = mongoose.model("User", {
-  firstname: {
+const User= mongoose.model("User", {
+  fullName: {
     type: String,
     required: true,
   },
-  lastname: {
-    type: String,
-    required: true,
-  },
-  phonenumber: {
+
+  phoneNumber: {
     type: String,
     required: true,
     unique: true,
   },
+
   email: {
     type: String,
     match: /^\S+@\S+\.\S+$/,
@@ -23,48 +21,53 @@ const User = mongoose.model("User", {
     unique: true,
     lowercase: true,
   },
-  emailverified: {
+
+  emailVerified: {
     type: Boolean,
     default: false,
   },
+
   password: {
     type: String,
     required: true,
   },
-  confirmpassword: {
-    type: String,
-    required: true,
-  },
-  createdat: {
+
+  createDate: {
     type: Date,
     required: true,
   },
-  profile_image_url: {
+
+  profileImageUrl: {
     type: String,
   },
+
   walletID: {
     type: mongoose.Schema.ObjectId,
     ref: "Wallet",
   },
-  offeredorder: [
+
+  recievedOrder: [
     {
       type: mongoose.Schema.ObjectId,
       ref: "Order",
     },
   ],
-  bookedorder: [
+
+  bookedOrder: [
     {
       type: mongoose.Schema.ObjectId,
       ref: "Order",
     },
   ],
-  pastofferedorder: [
+
+  pastrecievedOrder: [
     {
       type: mongoose.Schema.ObjectId,
       ref: "Order",
     },
   ],
-  pastbookedorder: [
+  
+  pastbookedOrder: [
     {
       type: mongoose.Schema.ObjectId,
       ref: "Order",
@@ -73,4 +76,4 @@ const User = mongoose.model("User", {
   
 });
 
-module.exports = User;
+module.exports = {User};

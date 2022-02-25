@@ -27,9 +27,10 @@ app.use(express.urlencoded({
 app.use(express.json());
 
 app.use("/api/email/", userRoute);
+app.use('/api/user', userRoute);
 
 
-var PORT = process.env.PORT || 6000;
+var PORT = process.env.PORT || 8000;
 
 server.listen(PORT, ()=>{
     console.log(`Running on Port ${PORT}`);

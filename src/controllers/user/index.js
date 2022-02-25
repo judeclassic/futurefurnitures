@@ -1,39 +1,40 @@
 var bcrypt = require('bcryptjs');
 var jwt = require('jsonwebtoken');
 
-var authenticate = require('../lib/authenticate.js');
-var User = require('../models/user.js');
-
+var authenticate = require('../../lib/authenticate.js');
+var {User} = require('../../models/user.js');
 
 exports.uploadProfilePic = (req, res) => {
-    console.log(req.file);
-    console.log("path name");
-    console.log(req.file.filename);
-    User.findOneAndUpdate(
-      { _id: req.params.userid },
-      { $set: { profile_image_url: req.file.filename } },
-      { new: true },
-      (err, user, doc) => {
-        if (!err) {
-          console.log(user.profile_image_url);
-          res.status(200).json({
-            code: 200,
-            message: "Profile image uploaded",
-            updateUser: user,
-          });
-        } else {
-          console.log(err);
-        }
+  console.log(req.file);
+  console.log("path name");
+  console.log(req.file.filename);
+  User.findOneAndUpdate(
+    { _id: req.params.userId },
+    { $set: { profile_image_url: req.file.filename } },
+    { new: true },
+    (err, user, doc) => {
+      if (!err) {
+        console.log(user.profile_image_url);
+        res.status(200).json({
+          code: 200,
+          message: "Profile image uploaded",
+          updateUser: user,
+        });
+      } else {
+        console.log(err);
       }
-    );
-  }
+    }
+  );
+}
 
 exports.login = (req, res) => {
     User.findOne({ email: req.body.email }, (err, user) => {
       if (user == null) {
         res.json({
           code: 400,
-          message: "Invalid email"
+          message: "Invalid email",
+          isSuccess: false,
+          data: {}
         });
       } else {
         if (user && bcrypt.compareSync(req.body.password, user.password)) {
@@ -43,7 +44,7 @@ exports.login = (req, res) => {
               email: user.email,
               password: user.password
             },
-            process.env.ACCESS_TOKEN_SECRET,
+            process.env.ACCESS_TOKEN_SECRET || '123456789',
             {
               expiresIn: "1d",
             }
@@ -52,17 +53,20 @@ exports.login = (req, res) => {
           let response = {};
 
           user.password = undefined;
-          user.confirmpassword = undefined;
+          user.confirmPassword = undefined;
 
           response.code = 200;
-          response.message = 'Sign in Successfull';
-          response.accesstoken = accessToken;
-          response.user = user;
+          response.isSuccess = true;
+          response.message = 'Sign in Successful';
+          response.accessToken = accessToken;
+          response.data = user;
 
           console.log(response);
           res.json(response);
         } else {
           res.json({
+            isSuccess: false,
+            data: {},
             code: 400,
             message: "Invalid password"
           });
@@ -73,38 +77,20 @@ exports.login = (req, res) => {
 
 exports.logOut =  (req, res) => {
     res.json('logged out');
-  }
-
-exports.sendMailOTP = (req, res) => {
-  console.log(val);
-  transporter.sendMail(
-    {
-      from: '"PoolYourCar 👻" <poolyourc@gmail.com>', // sender address
-      to: req.body.email, // list of receivers
-      subject: "Email Verification ✔", // Subject line
-      text: "Email Verification code", // plain text body
-      html: "<b>Your verification code is " + val + "</b>", // html body
-    },
-    function (error, info) {
-      if (error) {
-        res.send(error);
-      } else {
-        res.send("Email sent: " + info.response);
-      }
-    }
-  );
 }
+
+
 
 exports.verifyEmail = (req, res) => {
   console.log(req.params.id);
   if (req.body.code == val) {
     User.findOneAndUpdate(
       { _id: req.params.id },
-      { $set: { emailverified: true } },
+      { $set: { emailVerified: true } },
       { new: true },
       (err, user, doc) => {
         if (!err) {
-          console.log(user.emailverified);
+          console.log(user.emailVerified);
           res.status(200).json({
             code: 200,
             message: "Email Verified",
@@ -116,11 +102,13 @@ exports.verifyEmail = (req, res) => {
       }
     );
   } else {
-    console.log("bbhr");
+    console.log("working");
     res.json("Invalid code");
   }
 }
 
+
+//GET ALL USER DATA
 exports.getAllUsers = (req, res) => {
   User.find({}, (err, data) => {
     if (!err) {
@@ -132,8 +120,8 @@ exports.getAllUsers = (req, res) => {
 }
 
 exports.addUser = (req, res, next) => {
-  var datetime = new Date();
-  date = datetime.toJSON();
+  var dateTime = new Date();
+  date = dateTime.toJSON();
   console.log(req.body);
   let hash = bcrypt.hashSync(req.body.password, 10);
   if (req.body) {
@@ -146,13 +134,15 @@ exports.addUser = (req, res, next) => {
           res
             .json({
               code: 400,
-              message: "Email " + req.body.email + '" is already taken'
+              data: {},
+              message: "Email " + req.body.email + '" is already taken',
+              isSuccess: false
             });
         }else{
           
           User.findOne(
             {
-              phonenumber: req.body.phonenumber,
+              phoneNumber: req.body.phoneNumber,
             },
       
             function (err, result) {
@@ -161,26 +151,34 @@ exports.addUser = (req, res, next) => {
                 res
                   .json({
                     code: 400,
-                    message: "Phone number " + req.body.phonenumber + '" is already taken'
+                    data: {},
+                    message: "Phone number " + req.body.phoneNumber + '" is already taken',
+                    isSuccess: false
                   });
               }
 
-              var newuser = {
-                firstname: req.body.firstname,
-                lastname: req.body.lastname,
-                phonenumber: req.body.phonenumber,
+              var newUser = {
+                fullName: req.body.fullName,
+                phoneNumber: req.body.phoneNumber,
                 email: req.body.email,
                 password: hash,
-                confirmpassword: hash,
-                createdat: date,
+                confirmPassword: hash,
+                createDate: date,
               };
-              User.create(newuser)
+
+              User.create(newUser)
                 .then(
                   (user) => {
                     console.log("User has been Added ", user);
                     res.statusCode = 200;
+                    
                     res.setHeader("Content-Type", "application/json");
-                    res.json(user);
+                    res.json({
+                      code: 200,
+                      data: user,
+                      message: "Account created successfully",
+                      isSuccess: true
+                    });
                   },
                   (err) => next(err)
                 )
@@ -194,16 +192,20 @@ exports.addUser = (req, res, next) => {
     res.status(400).json({
       code: 400,
       message: "Missing Parameters",
+      isSuccess: false,
+      data: {}
     });
   }
 }
 
-exports.getUser = (req, res) => {
+exports.getUserData = (req, res) => {
   User.findById(req.user.id, (err, user) => {
     if (err) {
       res.json({
         code: 404,
-        message: "unable to retrieve data"
+        data: {},
+        message: "unable to retrieve data",
+        isSuccess: false
       });
     } else {
       const accessToken = jwt.sign(
@@ -221,12 +223,13 @@ exports.getUser = (req, res) => {
       let response = {};
 
       user.password = undefined;
-      user.confirmpassword = undefined;
+      user.confirmPassword = undefined;
 
       response.code = 200;
+      response.isSuccess = true;
       response.message = 'Refreshed';
-      response.accesstoken = accessToken;
-      response.user = user;
+      response.accessToken = accessToken;
+      response.data = user;
       res.json(response);
     }
   });
@@ -263,16 +266,16 @@ exports.editUser = (req, res) => {
 
 
 exports.updatePassword = (req, res) => {
-  let hashpassword = bcrypt.hashSync(req.body.password, 10);
+  let hashPassword = bcrypt.hashSync(req.body.password, 10);
 
   User.findById(req.params.id, (err, user, data) => {
     console.log("this is the user", user);
-    if (bcrypt.compareSync(req.body.currentpassword, user.password)) {
+    if (bcrypt.compareSync(req.body.currentPassword, user.password)) {
       console.log(user.password);
 
       User.findOneAndUpdate(
         { _id: req.params.id },
-        { $set: { password: hashpassword, confirmpassword: hashpassword } },
+        { $set: { password: hashPassword, confirmPassword: hashPassword } },
         { new: true },
         (err, doc) => {
           if (!err) {

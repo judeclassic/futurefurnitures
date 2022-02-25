@@ -6,7 +6,7 @@ exports.send = (options, callBack) => {
     mailjet
     .post("send", {'version': 'v3.1'})
     .request(options).then((result) => {
-        console.log(result.body)
+        console.log(result.body.Messages[0].To)
         return callBack(null, result);
     })
     .catch((err) => {

@@ -1,9 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const userEntry = require('../controllers/user');
-const emailEntry = require('../controllers/subscribe');
-const authenticateToken = require('../lib/authenticate');
-
+const userEntry = require('../../controllers/user');
+const emailEntry = require('../../controllers/subscribe');
+const authenticateToken = require('../../lib/authenticate');
 
 //Subscribe Email
 router.post(
@@ -11,13 +10,11 @@ router.post(
   emailEntry.subscribe
 );
 
-
 //Unsubscribe Email
 router.post(
   "/unsubscribe",
   emailEntry.unsubscribe
 );
-
 
 //User Login
 router.post(
@@ -25,20 +22,17 @@ router.post(
   userEntry.login
 );
 
-
 // User Logout
 router.get(
   "/logout",
   userEntry.logOut
 );
 
-
 //User Signup
 router.post(
   "/signup",
   userEntry.addUser
 );
-
 
 //Get USer
 // router.get(
