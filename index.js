@@ -1,36 +1,26 @@
-const express = require('express');
-const app = express();
-const cors = require('cors');
-const mongoose = require("mongoose");
-const dotenv = require('dotenv');
-const server = require('http').createServer(app);
+import express from 'express';
+import cors from 'cors';
+import { config } from 'dotenv';
+import http from 'http';
 
-if (process.env.ENV == 'production'){
-}else{
-    dotenv.config({ path: "./.env" });
-}
+import { theHouseInteriorApp } from './src/v1/index.js';
+// const theHouseInteriorApp = require('./src/v1/index');
+
+const app = express();
+
+const server = http.createServer(app);
 
 app.use(cors());
 
-require('./src/lib/connect_DB')(mongoose, {
-    name: 'Future Furnitures',
-});
+if (process.env.ENV == 'production'){
+}else{
+    config({ path: "./.env" });
+}
 
-const userRoute = require('./src/routes/user');
-
-app.use(express.static('public'));
-
-app.use(express.urlencoded({
-    extended: true
-}));
-
-app.use(express.json());
-
-app.use("/api/email/", userRoute);
-app.use('/api/user', userRoute);
+theHouseInteriorApp({ app });
 
 
-var PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 8000;
 
 server.listen(PORT, ()=>{
     console.log(`Running on Port ${PORT}`);
