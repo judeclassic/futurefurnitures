@@ -38,11 +38,11 @@ export const theHouseInteriorApp = function ({app}) {
 
     app.use(express.json());
     
-    app.use("/v1/api/email/", subscribeRouter({ Router, SubscriptionController, Subscription, EmailHandler, messages }));
-    app.use('/v1/api/user', userRouter({ Router, UserController, Authenticate, User, EmailHandler, bcrypt, jwt }));
-    app.use('/v1/api/product', productRouter({ Router, ProductController, Authenticate, Product, User, EmailHandler, messages, bcrypt, jwt }));
+    app.use("./v1/api/email/", subscribeRouter({ Router, SubscriptionController, Subscription, EmailHandler, messages }));
+    app.use('./v1/api/user', userRouter({ Router, UserController, Authenticate, User, EmailHandler, bcrypt, jwt }));
+    app.use('./v1/api/product', productRouter({ Router, ProductController, Authenticate, Product, User, EmailHandler, messages, bcrypt, jwt }));
     
-    app.use('/v1/api/order', orderRouter({ Router, OrderController, Authenticate, Order, User, Product, EmailHandler, messages, bcrypt, jwt }));
+    app.use('./v1/api/order', orderRouter({ Router, OrderController, Authenticate, Order, User, Product, EmailHandler, messages, bcrypt, jwt }));
 
     return app;
 }
