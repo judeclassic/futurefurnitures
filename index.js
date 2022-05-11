@@ -3,8 +3,7 @@ import cors from 'cors';
 import { config } from 'dotenv';
 import http from 'http';
 
-import { theHouseInteriorApp } from './src/v1/index.js';
-// const theHouseInteriorApp = require('./src/v1/index');
+import { theHouseInteriorApp } from './src/v1';
 
 const app = express();
 
@@ -17,7 +16,7 @@ if (process.env.ENV == 'production'){
     config({ path: "./.env" });
 }
 
-theHouseInteriorApp({ app });
+theHouseInteriorApp({ app, server });
 
 
 const PORT = process.env.PORT || 8000;

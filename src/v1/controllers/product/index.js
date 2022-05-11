@@ -1,4 +1,4 @@
-
+//@ts-check
 
 class SellerController {
     constructor({ Product, EmailHandler, messages }) {
@@ -11,9 +11,7 @@ class SellerController {
         return (req, res) => {
             console.log('yeah');
             const run = async () => {
-                console.log('yes boss');
                 try{
-                    console.log('yes');
                     const {
                         name,
                         description,
@@ -98,7 +96,7 @@ class SellerController {
                 }
             }
 
-            run();
+            return run();
         }
     }
 
@@ -131,9 +129,82 @@ class SellerController {
                 }
             }
 
-            run();
+            return run();
         }
     }
+
+    getSellerProducts = () => {
+        return (req, res) => {
+            const run = async () => {
+                try {
+                    const { id } = req.params;
+                    const products = await this.Product.find({ seller: id });
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        data: products,
+                    });
+                } catch (error) {
+                    return res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: error,
+                    });
+                }
+            }
+
+            return run();
+        }
+    }
+
+    getSellerSoldProducts = () => {
+        return (req, res) => {
+            const run = async () => {
+                try {
+                    const { id } = req.params;
+                    const products = await this.Product.find({ seller: id, status: 'sold' });
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        data: products,
+                    });
+                } catch (error) {
+                    return res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: "Internal Server Error",
+                    });
+                }
+            }
+
+            return run();
+        }
+    }
+
+    getSellerOrderedProducts = () => {
+        return (req, res) => {
+            const run = async () => {
+                try {
+                    const { id } = req.params;
+                    const products = await this.Product.find({ seller: id, status: 'ordered' });
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        data: products,
+                    });
+                } catch (error) {
+                    return res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: "Internal Server Error",
+                    });
+                }
+            }
+
+            return run();
+        }
+    }
+
 }
 
 
@@ -172,7 +243,7 @@ export default class ProductController extends SellerController {
                 }
             }
 
-            run();
+            return run();
         }
     }
 
@@ -204,7 +275,7 @@ export default class ProductController extends SellerController {
                 }
             }
 
-            run();
+            return run();
         }
     }
 
@@ -620,7 +691,6 @@ export default class ProductController extends SellerController {
                             { category: { $regex: req.params.search, $options: 'i' } },
                             { subCategory: { $regex: req.params.search, $options: 'i' } },
                         ],
-                        category: req.params.category,
                         isDeleted: false,
                     });
                     if (products === []) {
@@ -663,7 +733,6 @@ export default class ProductController extends SellerController {
                             { category: { $regex: req.params.search, $options: 'i' } },
                             { subCategory: { $regex: req.params.search, $options: 'i' } },
                         ],
-                        subCategory: req.params.subCategory,
                         isDeleted: false,
                     });
                     if (products === []) {
@@ -706,8 +775,6 @@ export default class ProductController extends SellerController {
                             { category: { $regex: req.params.search, $options: 'i' } },
                             { subCategory: { $regex: req.params.search, $options: 'i' } },
                         ],
-                        category: req.params.category,
-                        subCategory: req.params.subCategory,
                         isDeleted: false,
                     });
                     if (products === []) {
@@ -1017,4 +1084,6 @@ export default class ProductController extends SellerController {
             run();
         }
     }
+
+    
 }

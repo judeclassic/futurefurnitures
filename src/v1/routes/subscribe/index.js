@@ -1,7 +1,9 @@
-const router  = ({ Router, SubscriptionController, Subscription, emailHandler, messages }) => {
+//@ts-check
+
+const router  = ({ Router, SubscriptionController, Subscription, EmailHandler }) => {
     const router = Router();
 
-    const {subscribe, unSubscribe} = new SubscriptionController({ Subscription, emailHandler, messages });
+    const {subscribe, unSubscribe} = new SubscriptionController({ Subscription, EmailHandler });
 
     //Subscribe Email
     router.post(

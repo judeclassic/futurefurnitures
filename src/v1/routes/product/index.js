@@ -1,3 +1,4 @@
+//@ts-check
 
 const router = ({ ProductController, Router, Authenticate, Product, User, EmailHandler, messages, bcrypt, jwt }) => {
 

@@ -1,3 +1,4 @@
+//@ts-check
 
 const router = ({ Router, UserController, User, Authenticate, EmailHandler, bcrypt, jwt}) => {
     const router = Router();

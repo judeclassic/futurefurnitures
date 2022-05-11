@@ -1,3 +1,6 @@
+//@ts-check
+
+
 
 export default class UserController {
 
@@ -145,7 +148,7 @@ export default class UserController {
                 res.status(500).json({
                     status: false,
                     code: 500,
-                    message: error
+                    message: "Internal Server Error",
                 });
             }
         }
@@ -154,7 +157,8 @@ export default class UserController {
     // SEND VERIFICATION EMAIL
     sendVerificationEmail() {
         return (req, res) => {
-            this.User.findOne({ email: req.body.email }, (err, user) => {
+            const { email } = req.body;
+            this.User.findOne({ email: email }, (err, user) => {
                 if ( !user ) {
                     return res.json({
                         status: false,
@@ -162,11 +166,26 @@ export default class UserController {
                         message: "User not found",
                     });
                 }
-                this.EmailHandler.sendVerificationEmail(user.email, user.firstName, user.lastName, user.verificationCode);
-                res.status(201).json({
-                    status: true,
-                    code: 201,
-                    message: "Verification Email Sent",
+                const subject = "Verify your email";
+                const code = this.generateVerificationCode();
+                this.EmailHandler.sendVerificationEmail({ email, subject, code });
+                user.verificationCode = code;
+                user.save((err, doc) => {
+                    if (!err) {
+                        res.status(200).json({
+                            status: true,
+                            code: 200,
+                            message: "Verification code sent",
+                            user: doc,
+                        });
+                    } else {
+                        console.log(err);
+                        res.status(500).json({
+                            status: false,
+                            code: 500,
+                            message: "Internal Server Error",
+                        });
+                    }
                 });
             });
         }
@@ -232,7 +251,7 @@ export default class UserController {
                 res.status(500).json({
                     status: false,
                     code: 500,
-                    message: error.message,
+                    message: err.message,
                 });
             }
         };

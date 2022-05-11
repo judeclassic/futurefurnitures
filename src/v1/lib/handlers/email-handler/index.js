@@ -1,3 +1,5 @@
+//@ts-check
+
 import messages from '../../constants/messages';
 import nodemailer from 'nodemailer';
 import fs from 'fs';
@@ -6,7 +8,7 @@ import path from 'path';
 /**
   * Default values that can be changed to suit needs 
   */
- const DEFAULT_FROM_EMAIL = "thehouseinterior1@gmail.com";
+ const DEFAULT_FROM_EMAIL = "";
  const DEFAULT_PASSWORD = process.env.DEFAULT_PASSWORD;
  const DEFAULT_NAME = "The House Interior";
 
@@ -22,7 +24,7 @@ const transporter = nodemailer.createTransport({
 });
 
 
-const sendEmail =  async ({email, subject, message}) => {
+const sendEmail =  async (/** @type {import("nodemailer/lib/mailer").Options} */ message) => {
     try {
         message['from'] = `${DEFAULT_FROM_EMAIL} ${DEFAULT_NAME}`;
         
@@ -108,16 +110,18 @@ export default class EmailHandler{
         }
     }
 
-    static async sendVerificationEmail({email, subject, code, message}){
+    static async sendVerificationEmail({ email, subject, code }){
         try{
-            const __dirname = path.dirname(__filename);
-            var htmlContent = fs.readFile(__dirname + '/html/sendConfirmationCode.html').toString();
-            htmlContent = htmlContent.replace('{{code}}', code);
-            htmlContent = htmlContent.replace('{{message}}', message);
+            const message = {
+                to: email,
+                subject: subject,
+                html: `<p>Your verification code is: ${code}</p>`,
+            }
 
-            message['html'] = htmlContent;
-            message['subject'] = subject;
-            message['to'] = email;
+            // var htmlContent = fs.readFileSync(path.join(process.cwd(), '/html/sendConfirmationCode.html')).toString();
+            // htmlContent = htmlContent.replace('{{code}}', code);
+
+            // message['html'] = htmlContent;
     
             await sendEmail(message);
         }catch(err){
@@ -125,4 +129,40 @@ export default class EmailHandler{
             throw err;
         }
     }
+
+    static async sendPasswordResetEmail({ email, subject, code }){
+        try{
+            const message = {
+                to: email,
+                subject: subject,
+                html: `<p>Your password reset code is: ${code}</p>`,
+            }
+
+            // var htmlContent = fs.readFileSync(path.join(process.cwd(), '/html/sendConfirmationCode.html')).toString();
+            // htmlContent = htmlContent.replace('{{code}}', code);
+
+            // message['html'] = htmlContent;
+
+            await sendEmail(message);
+        }catch(err){
+            console.log(err);
+            return false;
+        }
+    }
+
+    static async sendSubscriptionEmail({ email, subject, name}){
+        try{
+            const message = {
+                to: email,
+                subject: subject,
+                html: `<p>Welcome to ${name}</p>`,
+            }
+
+            await sendEmail(message);
+        }catch(err){
+            console.log(err);
+            return false;
+        }
+    }
+
 }
