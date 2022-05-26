@@ -43,6 +43,14 @@ const Product = mongoose.model('product', mongoose.Schema({
     type: String,
     required: true,
   }],
+  weight: {
+    type: String,
+    required: true,
+  },
+  dimensions: {
+    type: String,
+    required: true,
+  },
   discount: {
     type: Number,
     required: true,
