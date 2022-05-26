@@ -8,7 +8,7 @@ const router = ({ Router, VendorController, Authenticate, Vendor, User, service,
 
     router.post('/register', vendorController.registerVendor());
 
-    router.post('/login', vendorController.loginVendor());  
+    router.post('/login', vendorController.loginVendor());
 
     router.get('/', verifyUserToken(), vendorController.getVendors());
 

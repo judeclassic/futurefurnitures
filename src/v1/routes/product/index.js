@@ -25,6 +25,18 @@ const router = ({ ProductController, Router, Authenticate, Product, User, EmailH
     // Get Product By Id
     productRouter.get('/getById/:id', productController.getProductById() );
 
+    // Get Top Similar Products By Their Ids
+    productRouter.get('/getBySimilarity/:id', productController.getSimilarProducts());
+
+    // Get Featured Products
+    productRouter.get('/getFeatured', productController.getFeaturedProducts());
+
+    // Get Top Rated Products
+    productRouter.get('/getTopRated', productController.getTopRatedProducts());
+
+    // Get Top Offerred Products
+    productRouter.get('/getTopOfferred', productController.getTopOfferredProducts());
+
     // Get Product By Category
     productRouter.get('/getByCategory/:category', productController.getProductByCategory() );
 

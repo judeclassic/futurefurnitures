@@ -26,6 +26,8 @@ class SellerController {
                         brand,
                         category,
                         subCategory,
+                        rating,
+                        featured,
                         status,
                         isVerified,
                         isActive,
@@ -46,6 +48,7 @@ class SellerController {
                         brand,
                         category,
                         subCategory,
+                        featured,
                         createDate: new Date,
                         updateDate: new Date,
                         status,
@@ -251,7 +254,7 @@ export default class ProductController extends SellerController {
         return (req, res) => {
             const run = async () => {
                 try {
-                    const product = await this.Product.findById(req.params.id);
+                    const product = await this.Product.findByIdAndUpdate(req.params.id, { $inc: { views: 1 } });
                     if (!product) {
                         return res.status(200).json({
                             status: false,
@@ -259,6 +262,7 @@ export default class ProductController extends SellerController {
                             code: 201,
                         });
                     }
+
                     res.status(200).json({
                         status: true,
                         code: 200,
@@ -276,6 +280,129 @@ export default class ProductController extends SellerController {
             }
 
             return run();
+        }
+    }
+
+    getSimilarProducts = () => {
+        return (req, res) => {
+            const run = async () => {
+                try {
+                    const limit = req.query.limit || 10;
+                    const ids = req.params.ids;
+                    console.log(ids);
+                    const products = await this.Product.find({ _id: { $in: ids } });
+                    const similarProducts = [];
+                    products.forEach(product => {
+                        if (product.isDeleted) {
+                            return;
+                        }
+                        if (similarProducts.length >= limit) {
+                            return;
+                        }
+                        let similarProduct = this.Product.find({
+                            _id: { $ne: product._id },
+                            category: product.category,
+                            isDeleted: false,
+                        }).limit((limit / ids.length).toFixed(0));
+                        similarProducts.push(similarProduct);
+                    });
+                    const similarProductsArray = await Promise.all(similarProducts);
+
+                    const similarProductsArrayFlat = similarProductsArray.reduce((acc, curr) => acc.concat(curr), []);
+                    res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "Similar products fetched successfully",
+                        products: similarProductsArrayFlat,
+                    });
+                }
+                catch (error) {
+                    console.log(error);
+                    res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: "Internal server error",
+                        error,
+                    });
+                }
+            }
+
+            return run();
+        }
+    }
+
+    getFeaturedProducts = () => {
+        return (req, res) => {
+            const run = async () => {
+                try {
+                    const products = await this.Product.find({ featured: true });
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "Featured products fetched successfully",
+                        data: products,
+                    });
+                } catch (error) {
+                    return res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: error,
+                    });
+                }
+            }
+
+            return run();
+        }
+    }
+
+    getTopRatedProducts = () => {
+        return (req, res) => {
+            const run = async () => {
+                try {
+                    const products = await this.Product.find({ rating: { $gt: 3.5 } });
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "Top rated products fetched successfully",
+                        data: products,
+                    });
+                }
+                catch (error) {
+                    return res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: error,
+                    });
+                }
+            }
+
+            return run();
+        }
+    }
+
+    getTopOfferredProducts = () => {
+        return (req, res) => {
+            const run = async () => {
+                try {
+                    const products = await this.Product.find().sort({ views: -1 });
+                    return res.json({
+                        status: true,
+                        code: 200,
+                        message: "Top offered products fetched successfully",
+                        products
+                    });
+                }
+                catch (error) {
+                    console.log(error);
+                    return res.json({
+                        status: true,
+                        code: 500,
+                        message: error,
+                    });
+                }
+            }
+
+            run();
         }
     }
 
@@ -299,6 +426,11 @@ export default class ProductController extends SellerController {
                         code: 200,
                         message: "Products fetched successfully",
                         products,
+                    });
+
+                    products.forEach(async (product) => {
+                        product.views += 1;
+                        await product.save();
                     });
                 } catch (error) {
                     res.status(500).json({
@@ -334,6 +466,11 @@ export default class ProductController extends SellerController {
                         code: 200,
                         message: "Products fetched successfully",
                         products,
+                    });;
+
+                    products.forEach(async (product) => {
+                        product.views += 1;
+                        await product.save();
                     });
                 }
                 catch (error) {
@@ -1085,5 +1222,43 @@ export default class ProductController extends SellerController {
         }
     }
 
+    rateProduct() {
+        return (req, res) => {
+            const run = async () => {
+                try {
+                    const product = await this.Product.findById(req.params.productId);
+                    if (product === null) {
+                        return res.status(200).json({
+                            status: false,
+                            message: "Product not found",
+                            code: 201,
+                        });
+                    }
+                    const newRating = {
+                        userId: req.params.userId,
+                        rating: req.body.rating,
+                        comment: req.body.comment,
+                    }
+                    product.ratings.push(newRating);
+                    product.save();
+                    res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "Product rated successfully",
+                    });
+                }
+                catch (error) {
+                    res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: "Internal server error",
+                        error,
+                    });
+                }
+            }
+
+            run();
+        }
+    }
     
 }

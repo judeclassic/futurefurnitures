@@ -47,9 +47,25 @@ const Product = mongoose.model('product', mongoose.Schema({
     type: Number,
     required: true,
   },
-  rating: {
+  rating: [{
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'user',
+    },
+    rating: {
+      type: Number,
+      required: true,
+    },
+    comment: {
+      type: String,
+    },
+  }],
+  views: {
     type: Number,
-    required: true,
+    default: 0,
+  },
+  featured: {
+    type: Boolean,
   },
   createdAt: {
     type: Date,
