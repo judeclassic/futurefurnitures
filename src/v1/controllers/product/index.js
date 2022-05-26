@@ -11,11 +11,11 @@ class SellerController {
         return (req, res) => {
             console.log('yeah');
             const run = async () => {
+                const image = req.files.map(file => file.imagePath);
                 try{
                     const {
                         name,
                         description,
-                        image,
                         price,
                         discount,
                         color,
@@ -26,7 +26,6 @@ class SellerController {
                         brand,
                         category,
                         subCategory,
-                        rating,
                         featured,
                         status,
                         isVerified,
@@ -41,7 +40,6 @@ class SellerController {
                         discount,
                         color,
                         size,
-                        rating: 1,
                         seller,
                         currectPrice,
                         quantity,
@@ -64,7 +62,7 @@ class SellerController {
                         data: product,
                     });
                 } catch (error) {
-                    console.log(error);
+                    // console.log(error);
                     return res.status(500).json({
                         status: false,
                         code: 500,

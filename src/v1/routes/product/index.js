@@ -1,6 +1,6 @@
 //@ts-check
 
-const router = ({ ProductController, Router, Authenticate, Product, User, EmailHandler, messages, bcrypt, jwt }) => {
+const router = ({ ProductController, Router, Authenticate, Product, User, EmailHandler, messages, bcrypt, jwt, uploader }) => {
 
     const productController = new ProductController({ Product, User, EmailHandler, messages, bcrypt, jwt });
     const { verifySellerToken } = new Authenticate({ jwt, bcrypt });
@@ -9,7 +9,7 @@ const router = ({ ProductController, Router, Authenticate, Product, User, EmailH
 
     //   FOR SELLER
     // Create Product
-    productRouter.post('/create', verifySellerToken(), productController.createProduct());
+    productRouter.post('/create', verifySellerToken(), uploader, productController.createProduct());
 
     // Update Product
     productRouter.put('/update/:id', verifySellerToken(), productController.updateProduct());
