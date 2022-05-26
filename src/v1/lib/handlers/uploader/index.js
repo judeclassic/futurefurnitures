@@ -4,9 +4,9 @@ import multer from 'multer';
 import {v2 as cloudinary } from 'cloudinary';
 
 cloudinary.config({
-    cloud_name: "craftydev",
-    api_key: "617572419411959",
-    api_secret: "x77G6foHYwcJepVUg4-AJiPtBaA",
+    cloud_name: "house-interior",
+    api_key: "244144477296673",
+    api_secret: "X8tWIKx4cjgsfv0bIJ-6H7ew4ak",
     secure: true
 });
   
