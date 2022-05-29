@@ -25,35 +25,27 @@ const Vendor = mongoose.model("vendor", {
         type: String,
         required: true
     },
-    city: {
-        type: String,
-        required: true
-    },
     state: {
         type: String,
-        required: true
     },
     country: {
         type: String,
-        required: true
     },
     primary_service: {
         type: String,
-        required: true
     },
     secondary_service: {
         type: String,
     },
     crew_size: {
         type: String,
-        required: true
     },
     description: {
         type: String,
     },
-    crew_image: {
+    image: [{
         type: String,
-    },
+    }],
     place_of_training: {
         type: String,
     },

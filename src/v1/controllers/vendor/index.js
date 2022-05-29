@@ -372,26 +372,16 @@ export default class VendorController extends ServiceController {
         this.paymentHandler = new PaymentHandler();
     }
 
-    registerVendor = () => {
+    signUpVendor = () => {
         return (req, res) => {
             const run = async () => {
                 const {
-                    email,
                     name,
+                    email,
                     phone,
                     address,
-                    city,
-                    state,
-                    country,
-                    primary_service,
-                    secondary_service,
-                    crew_size,
-                    description,
-                    crew_image,
-                    place_of_training,
-                    years_of_experience,
-                    license_source,
                 } = req.body;
+
                 const password = this.bcrypt.hashSync(req.body.password, 10);
 
                 const vendorWithEmail = await this.vendor.findOne({ email });
@@ -420,17 +410,6 @@ export default class VendorController extends ServiceController {
                     name,
                     phone,
                     address,
-                    city,
-                    state,
-                    country,
-                    primary_service,
-                    secondary_service,
-                    crew_size,
-                    description,
-                    crew_image,
-                    place_of_training,
-                    years_of_experience,
-                    license_source,
                 });
                 
                 if (vendor) {
@@ -510,6 +489,672 @@ export default class VendorController extends ServiceController {
         }
     }
 
+    updateJobInfo = () => {
+        return (req, res) => {
+            const run = async () => {
+                try {
+                    const { id } = req.body;
+                    const {
+                        primary_service,
+                        place_of_training,
+                        service_years,
+                        crew_size,
+                        state,
+                        city,
+                        discription,
+                    } = req.body;
+
+                    const vendor = await this.vendor.findById(id);
+                    if (!vendor) {
+                        return res.status(500).json({
+                            status: false,
+                            code: 500,
+                            message: "Vendor not found",
+                        });
+                    }
+                    const updatedVendor = await this.vendor.findByIdAndUpdate(id, {
+                        primary_service,
+                        place_of_training,
+                        service_years,
+                        crew_size,
+                        state,
+                        city,
+                        discription,
+                    });
+                    if (updatedVendor) {
+                        return res.status(200).json({
+                            status: true,
+                            code: 200,
+                            message: "Vendor info updated successfully",
+                            vendor: {...updatedVendor._doc, password: undefined},
+                        });
+                    } else {
+                        return res.status(500).json({
+                            status: false,
+                            code: 500,
+                            message: "Vendor info update failed",
+                        });
+                    }
+                } catch (err) {
+                    this.logger.error(err);
+                    return res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: "Vendor info update failed",
+                    });
+                }
+            }
+
+            run().catch((err) => {
+                this.logger.error(err);
+                return res.status(500).json({
+                    status: false,
+                    code: 500,
+                    message: "Vendor info update failed",
+                });
+            });
+        }
+    }
+
+    updatePhotoAndLicense = () => {
+        return (req, res) => {
+            const run = async () => {
+                const { id } = req.body;
+                var image = req.files && req.files.map(file => file.imagePath);
+                const license = req.body.isLicense && image[image.length - 1];
+                if (req.body.isLicense) {
+                    image.pop();
+                }
+                const vendor = await this.vendor.findById(id);
+                if (!vendor) {
+                    return res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: "Vendor not found",
+                    });
+                }
+                const updatedVendor = await this.vendor.findByIdAndUpdate(id, {
+                    image: [...vendor.image, ...image],
+                    license,
+                });
+                if (updatedVendor) {
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "Vendor info updated successfully",
+                        vendor: {...updatedVendor._doc, password: undefined},
+                    });
+                } else {
+                    return res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: "Vendor info update failed",
+                    });
+                }
+            }
+
+            run().catch((err) => {
+                this.logger.error(err);
+                return res.status(500).json({
+                    status: false,
+                    code: 500,
+                    message: "Vendor info update failed",
+                });
+            });
+        }
+    }
+
+    reviewVendor = () => {
+        return (req, res) => {
+            const run = async () => {
+                const {
+                    id,
+                    isVerified,
+                    status,
+                } = req.body;
+
+                const vendor = await this.vendor.findById(id);
+                if (!vendor) {
+                    return res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: "Vendor not found",
+                    });
+                }
+                const updatedVendor = await this.vendor.findByIdAndUpdate(id, {
+                    isVerified,
+                    status,
+                });
+                if (updatedVendor) {
+                    return res.status(200).json({
+                        status: true,  
+                        code: 200,
+                        message: "Vendor info updated successfully",
+                        vendor: {...updatedVendor._doc, password: undefined},
+                    });
+                } else {
+                    return res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: "Vendor info update failed",
+                    });
+                }
+            }
+
+            run().catch((err) => {
+                this.logger.error(err);
+                return res.status(500).json({
+                    status: false,
+                    code: 500,
+                    message: "Vendor info update failed",
+                });
+            });
+        }
+    }
+
+    viewExpectedFunds = () => {
+        return (req, res) => {
+            const run = async () => {
+                const { vendorId } = req.params;
+                const vendor = await this.vendor.findById(vendorId);
+                if (!vendor) {
+                    return res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: "Vendor not found",
+                    });
+                }
+                const expectedFunds = await this.service.find({
+                    vendor: vendor._id,
+                });
+                if (expectedFunds) {
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "Expected funds fetched successfully",
+                        expectedFunds,
+                    });
+                } else {
+                    return res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: "Expected funds fetch failed or is Empty",
+                    });
+                }
+            }
+
+            run().catch((err) => {
+                this.logger.error(err);
+                return res.status(500).json({
+                    status: false,
+                    code: 500,
+                    message: "Expected funds fetch failed",
+                });
+            });
+        }
+    }
+
+    viewPendingFunds = () => {
+        return (req, res) => {
+            const run = async () => {
+                const { vendorId } = req.params;
+                const vendor = await this.vendor.findById(vendorId);
+                if (!vendor) {
+                    return res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: "Vendor not found",
+                    });
+                }
+                const pendingFunds = await this.service.find({
+                    vendor: vendor._id,
+                    status: "pending",
+                });
+                if (pendingFunds) {
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "Pending funds fetched successfully",
+                        pendingFunds,
+                    });
+                } else {
+                    return res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: "Pending funds fetch failed or is Empty",
+                    });
+                }
+            }
+
+            run().catch((err) => {
+                this.logger.error(err);
+                return res.status(500).json({
+                    status: false,
+                    code: 500,
+                    message: "Pending funds fetch failed",
+                });
+            });
+        }
+    }
+
+    viewAvailableFunds = () => {
+        return (req, res) => {
+            const run = async () => {
+                const { vendorId } = req.params;
+                const vendor = await this.vendor.findById(vendorId);
+                if (!vendor) {
+                    return res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: "Vendor not found",
+                    });
+                }
+                const availableFunds = await this.service.find({
+                    vendor: vendorId,
+                    status: "available",
+                });
+                if (availableFunds) {
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "Available funds fetched successfully",
+                        availableFunds,
+                    });
+                } else {
+                    return res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: "Available funds fetch failed or is Empty",
+                    });
+                }
+            }
+
+            run().catch((err) => {
+                this.logger.error(err);
+                return res.status(500).json({
+                    status: false,
+                    code: 500,
+                    message: "Available funds fetch failed",
+                });
+            });
+        }
+    }
+
+    viewWithdrawFunds = () => {
+        return (req, res) => {
+            const run = async () => {
+                const { vendorId } = req.user;
+                const vendor = await this.vendor.findById(vendorId);
+                if (!vendor) {
+                    return res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: "Vendor not found",
+                    });
+                }
+                const withdrawFunds = await this.service.find({
+                    vendor: vendor._id,
+                    status: "withdrawn",
+                });
+                if (withdrawFunds) {
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "Withdraw funds fetched successfully",
+                        withdrawFunds,
+                    });
+                } else {
+                    return res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: "Withdraw funds fetch failed or is Empty",
+                    });
+                }
+            }
+
+            run().catch((err) => {
+                this.logger.error(err);
+                return res.status(500).json({
+                    status: false,
+                    code: 500,
+                    message: "Withdraw funds fetch failed",
+                });
+            });
+        }
+    }
+
+    changeProfilePassword = () => {
+        return (req, res) => {
+            const run = async () => {
+                const { id } = req.user;
+                const {
+                    oldPassword,
+                    newPassword,
+                } = req.body;
+
+                const vendor = await this.vendor.findById(id);
+                if (!vendor) {
+                    return res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: "Vendor not found",
+                    });
+                }
+                const isValid = await this.bcrypt.compare(oldPassword, vendor.password);
+                if (!isValid) {
+                    return res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: "Old password is incorrect",
+                    });
+                }
+                const password = await this.bcrypt.hash(newPassword, 10);
+                const updatedVendor = await this.vendor.findByIdAndUpdate(id, {
+                    password,
+                }); 
+                if (updatedVendor) {
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "Vendor password updated successfully",
+                        vendor: {...updatedVendor._doc, password: undefined},
+                    });
+                } else {
+                    return res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: "Vendor password update failed",
+                    });
+                }
+            }
+
+            run().catch((err) => {
+                this.logger.error(err);
+                return res.status(500).json({
+                    status: false,
+                    code: 500,
+                    message: "Vendor password update failed",
+                });
+            });
+        }
+    }
+
+    changeProfileEmail = () => {
+        return (req, res) => {
+            const run = async () => {
+                const { id } = req.user;
+                const {
+                    email,
+                    password,
+                } = req.body;
+
+                const vendor = await this.vendor.findById(id);
+                if (!vendor) {
+                    return res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: "Vendor not found",
+                    });
+                }
+                const isValid = await this.bcrypt.compare(password, vendor.password);
+                if (!isValid) {
+                    return res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: "Password is incorrect",
+                    });
+                }
+                const updatedVendor = await this.vendor.findByIdAndUpdate(id, {
+                    email,
+                });
+                if (updatedVendor) {
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "Vendor email updated successfully",
+                        vendor: {...updatedVendor._doc, password: undefined},
+                    });
+                } else {
+                    return res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: "Vendor email update failed",
+                    });
+                }
+            }
+
+            run().catch((err) => {
+                this.logger.error(err);
+                return res.status(500).json({
+                    status: false,
+                    code: 500,
+                    message: "Vendor email update failed",
+                });
+            });
+        }
+    }
+
+    changeProfilePhone = () => {
+        return (req, res) => {
+            const run = async () => {
+                const { id } = req.user;
+                const {
+                    email,
+                    password,
+                } = req.body;
+
+                const vendor = await this.vendor.findById(id);
+                if (!vendor) {
+                    return res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: "Vendor not found",
+                    });
+                }
+                const isValid = await this.bcrypt.compare(password, vendor.password);
+                if (!isValid) {
+                    return res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: "Password is incorrect",
+                    });
+                }
+                const updatedVendor = await this.vendor.findByIdAndUpdate(id, {
+                    email,
+                });
+                if (updatedVendor) {
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "Vendor phone number updated successfully",
+                        vendor: {...updatedVendor._doc, password: undefined},
+                    });
+                } else {
+                    return res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: "Vendor phone number update failed",
+                    });
+                }
+            }
+
+            run().catch((err) => {
+                this.logger.error(err);
+                return res.status(500).json({
+                    status: false,
+                    code: 500,
+                    message: "Vendor phone number update failed",
+                });
+            });
+        }
+    }
+
+    changeProfileCountry = () => {
+        return (req, res) => {
+            const run = async () => {
+                const { id } = req.user;
+                const {
+                    country,
+                } = req.body;
+
+                const vendor = await this.vendor.findById(id);
+                if (!vendor) {
+                    return res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: "Vendor not found",
+                    });
+                }
+                const updatedVendor = await this.vendor.findByIdAndUpdate(id, {
+                    country,
+                });
+                if (updatedVendor) {
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "Vendor country updated successfully",
+                        vendor: {...updatedVendor._doc, password: undefined},
+                    });
+                } else {
+                    return res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: "Vendor country update failed",
+                    });
+                }
+            }
+
+            run().catch((err) => {
+                this.logger.error(err);
+                return res.status(500).json({
+                    status: false,
+                    code: 500,
+                    message: "Vendor country update failed",
+                });
+            });
+        }
+    }
+
+    changeProfileState = () => {
+        return (req, res) => {
+            const run = async () => {
+                const { id } = req.user
+                const {
+                    state,
+                } = req.body;
+
+                const vendor = await this.vendor.findById(id);
+                if (!vendor) {
+                    return res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: "Vendor not found",
+                    });
+                }
+                const updatedVendor = await this.vendor.findByIdAndUpdate(id, {
+                    state,
+                });
+                if (updatedVendor) {
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "Vendor state updated successfully",
+                        vendor: {...updatedVendor._doc, password: undefined},
+                    });
+                } else {
+                    return res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: "Vendor state update failed",
+                    });
+                }
+            }
+
+            run().catch((err) => {
+                this.logger.error(err);
+                return res.status(500).json({
+                    status: false,
+                    code: 500,
+                    message: "Vendor state update failed",
+                });
+            });
+        }
+    }
+
+    deActivateVendorAcount = () => {
+        return (req, res) => {
+            const run = async () => {
+                const { id } = req.user;
+                const {
+                    password,
+                } = req.body;
+                
+                const vendor = await this.vendor.findById(id);
+                if (!vendor) {
+                    return res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: "Vendor not found",
+                    });
+                }
+                const isValid = await this.bcrypt.compare(password, vendor.password);
+                if (!isValid) {
+                    return res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: "Password is incorrect",
+                    });
+                }
+                const updatedVendor = await this.vendor.findByIdAndUpdate(id, {
+                    isActive: false,
+                });
+                if (updatedVendor) {
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "Vendor account deactivated successfully",
+                    });
+                } else {
+                    return res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: "Vendor account deactivation failed",
+                    });
+                }
+            }
+
+            run().catch((err) => {
+                this.logger.error(err);
+                return res.status(500).json({
+                    status: false,
+                    code: 500,
+                    message: "Vendor account deactivation failed",
+                });
+            });
+        }
+    }
+
+                
+
+
+                
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     getVendors = () => {
         return (req, res) => {
             const run = async () => {
@@ -588,7 +1233,7 @@ export default class VendorController extends ServiceController {
 
         return (req, res) => {
             const run = async () => {
-                const { id } = req.params;
+                const { id } = req.user;
                 const vendor = await this.vendor.findByIdAndUpdate(id, req.body, {
                     new: true,
                 });
@@ -814,8 +1459,7 @@ export default class VendorController extends ServiceController {
         }
     }
 
-
-    getPaidVendorService = () => {
+    viewAllRequests = () => {
         /**
          * @param {object} res
          * @param {object} req
@@ -825,24 +1469,92 @@ export default class VendorController extends ServiceController {
         return (req, res) => {
             const run = async () => {
                 const { id } = req.params;
-                const vendor = await this.vendor.findById(id, {
-                    _id: 0,
-                    services: 1,
+                const requests = await this.service.find({vendor: id});
+                if (requests) {
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "Requests fetched successfully",
+                        requests: requests
                     });
-                if (!vendor) {
+                } else {
+                    return res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: "Requests fetch failed",
+                    });
+                }
+            }
+
+            run().catch((err) => {
+                this.logger.error(err);
+                return res.status(500).json({
+                    status: false,
+                    code: 500,
+                    message: "Requests fetch failed",
+                });
+            });
+        }
+    }
+
+
+    withdrawFunds = () => {
+        /**
+         * @param {object} res
+         * @param {object} req
+         * @returns {object}
+         */
+
+        return (req, res) => {
+            const run = async () => {
+                const { id, serviceId } = req.body;
+                const vendor = await this.vendor.findById(id);
+                const service = await this.service.findById(serviceId);
+                if (!vendor || !service ) {
                     return res.status(404).json({
                         status: false,
                         code: 404,
-                        message: "Vendor not found",
+                        message: "Vendor or Service not found",
                     });
-                } else {
-                    const services = await this.service.find({vendor: vendor._id, status: "paid"});
-                    if (services) {
+                } else { 
+                    if (service.status === "pending") {
+                        return res.status(400).json({
+                            status: false,
+                            code: 400,
+                            message: "Service is still pending",
+                        });
+                    }
+                    if (service.status === "withdrawn") {
+                        return res.status(400).json({
+                            status: false,
+                            code: 400,
+                            message: "Service is already withdrawn",
+                        });
+                    }
+                    const updateService = await this.service.findByIdAndUpdate(serviceId, {
+                        status: "withdrawn",
+                    }, {
+                        new: true,
+                    });
+                    const updatedVendor = await this.vendor.findByIdAndUpdate(id, {
+                        $inc: {
+                            balance: -req.body.amount,
+                        },
+                    }, {
+                        new: true,
+                    });
+                    if (updatedVendor && updateService) {
                         return res.status(200).json({
                             status: true,
                             code: 200,
-                            message: "Services fetched successfully",
-                            services: services.map(service => ({...service._doc})),
+                            message: "Funds withdrawn successfully",
+                            vendor: {...updatedVendor._doc, password: undefined},
+                        });
+                    } else {
+                        return res.status(500).json({
+                            status: false,
+                            code: 500,
+                            message: "Funds withdrawal failed",
                         });
                     }
                 }
@@ -852,7 +1564,7 @@ export default class VendorController extends ServiceController {
                 return res.status(500).json({
                     status: false,
                     code: 500,
-                    message: "Services fetch failed",
+                    message: "Funds withdrawal failed",
                 });
             });
         }

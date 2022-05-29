@@ -21,11 +21,11 @@ export default class Authenticate {
                     const token = bearerToken.split(" ",2)[1];
                     const decoded = await this.jwt.verify(token, process.env.USER_ACCESS_TOKEN_SECRET);
                     req.user = decoded;
-                    console.log('User', req.user);
+                    // console.log('User', req.user);
                     return next();
                 }
                 catch (error) {
-                    console.log("error", error);
+                    // console.log("error", error);
                     return res.json({
                         status: false,
                         code: 403,
@@ -90,18 +90,10 @@ export default class Authenticate {
                     const token = bearerToken.split(" ",2)[1];
                     const decoded = await this.jwt.verify(token, process.env.USER_ACCESS_TOKEN_SECRET);
                     req.user = decoded;
-                    if (req.user.role !== "seller" && req.user.role !== "admin") {
-                        console.log('we rule the world')
-                        return res.json({
-                            status: false,
-                            code: 403,
-                            message: 'Authentication Failed'
-                        });
-                    }
                     return next();
                 }
                 catch (error) {
-                    console.log(error);
+                    // console.log(error);
                     return res.json({
                         code: 403,
                         message: 'Authentication Failed'

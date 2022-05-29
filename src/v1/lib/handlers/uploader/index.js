@@ -17,8 +17,6 @@ MyCustomStorage.prototype._handleFile = function _handleFile (req, file, cb) {
         if (error) {
             return cb(error);
         }
-        // console.log(result);
-        console.log(result);
         cb(null, {
             imagePath: result.url
         });
