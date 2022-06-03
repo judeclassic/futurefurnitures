@@ -1,3 +1,7 @@
+//@ts-check
+const USER_ACCESS_TOKEN_SECRET = process.env.USER_ACCESS_TOKEN_SECRET || 'rirriurh849g498gyh4iggntfjnvo7';
+const CLICK_ACCESS_TOKEN_SECRET = process.env.CLICK_ACCESS_TOKEN_SECRET || 'rirriurh849g498gyh4iggntfjnvo7';
+
 export default class Authenticate {
 
     constructor({User, bcrypt, jwt}) {
@@ -19,7 +23,7 @@ export default class Authenticate {
                 }
                 try {
                     const token = bearerToken.split(" ",2)[1];
-                    const decoded = await this.jwt.verify(token, process.env.USER_ACCESS_TOKEN_SECRET);
+                    const decoded = await this.jwt.verify(token, USER_ACCESS_TOKEN_SECRET);
                     req.user = decoded;
                     // console.log('User', req.user);
                     return next();
@@ -51,7 +55,7 @@ export default class Authenticate {
                     });
                 }
                 try {
-                    const decoded = await this.jwt.verify(token, process.env.USER_ACCESS_TOKEN_SECRET);
+                    const decoded = await this.jwt.verify(token, USER_ACCESS_TOKEN_SECRET);
                     req.user = decoded;
                     if (req.user.user.role !== "admin") {
                         return res.json({
@@ -88,7 +92,7 @@ export default class Authenticate {
                 }
                 try {
                     const token = bearerToken.split(" ",2)[1];
-                    const decoded = await this.jwt.verify(token, process.env.USER_ACCESS_TOKEN_SECRET);
+                    const decoded = await this.jwt.verify(token, USER_ACCESS_TOKEN_SECRET);
                     req.user = decoded;
                     return next();
                 }
@@ -118,7 +122,7 @@ export default class Authenticate {
                 }
 
                 try {
-                    const decoded = await this.jwt.verify(token, process.env.CLICK_ACCESS_TOKEN_SECRET);
+                    const decoded = await this.jwt.verify(token, CLICK_ACCESS_TOKEN_SECRET);
                     req.user = decoded;
                     return next();
                 }

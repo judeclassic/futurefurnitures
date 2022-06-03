@@ -42,6 +42,10 @@ const Seller= mongoose.model("Seller", mongoose.Schema({
   verificationCode: {
     type: String,
   },
+  cart: [{
+    type: mongoose.Schema.ObjectId,
+    ref: "Product",
+  }],
   savedProducts: [{
     type: mongoose.Schema.ObjectId,
     ref: "Product",

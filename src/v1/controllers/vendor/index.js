@@ -1,5 +1,8 @@
 //@ts-check
 
+
+const USER_ACCESS_TOKEN_SECRET = process.env.USER_ACCESS_TOKEN_SECRET || 'rirriurh849g498gyh4iggntfjnvo7';
+
 class ServiceController {
     constructor({ service, Vendor, User, EmailHandler, PaymentHandler, bcrypt, jwt, Logger }) {
         this.Service = service;
@@ -465,7 +468,7 @@ export default class VendorController extends ServiceController {
                             email: vendor.email,
                             id: vendor._id,
                             role: vendor.role,
-                        }, process.env.USER_ACCESS_TOKEN_SECRET, {
+                        }, USER_ACCESS_TOKEN_SECRET, {
                             expiresIn: "1h",
                         });
                         return res.status(200).json({

@@ -1,12 +1,13 @@
 //@ts-check
 
-
+const USER_ACCESS_TOKEN_SECRET = process.env.USER_ACCESS_TOKEN_SECRET || 'rirriurh849g498gyh4iggntfjnvo7';
 
 export default class UserController {
 
-    constructor({ User, EmailHandler, bcrypt, jwt }) {
-        this.User = User;
+    constructor({ Seller, EmailHandler, Product, bcrypt, jwt }) {
+        this.Seller = Seller;
         this.EmailHandler = EmailHandler;
+        this.Product = Product;
         this.bcrypt = bcrypt;
         this.jwt = jwt;
     }
@@ -16,33 +17,33 @@ export default class UserController {
     }
 
     // REGISTER USER
-    registerUser = () => {  
+    registerSeller = () => {  
         return (req, res) => {
             try{
                 let hashPassword = this.bcrypt.hashSync(req.body.password, 10);
                 let code = this.generateVerificationCode();
 
-                this.User.findOne({
+                this.Seller.findOne({
                     email: req.body.email,
-                }, (err, user) => {
-                    if (user) {
+                }, (err, seller) => {
+                    if (seller) {
                         return res.json({
                             success: false,
                             code: 400,
                             message: "Email already exists",
                         });
                     } else {
-                        this.User.findOne({
+                        this.Seller.findOne({
                             phone: req.body.phone,
-                            }, (err, user) => {
-                                if (user) {
+                            }, (err, seller) => {
+                                if (seller) {
                                     return res.json({
                                         success: false,
                                         code: 400,
                                         message: "Phone number already exists",
                                     });
                                 } else {
-                                    let user = new this.User({
+                                    let seller = new this.Seller({
                                         name: req.body.name,
                                         email: req.body.email,
                                         password: hashPassword,
@@ -53,8 +54,6 @@ export default class UserController {
                                         createDate: new Date(),
                                         updateDate: new Date(),
                                         verificationCode: code,
-                                        role: req.body.role,
-                                        status: 'active',
                                         address: req.body.address,
                                         phone: req.body.phone,
                                         profilePic: req.body.profilePic,
@@ -63,14 +62,15 @@ export default class UserController {
                                         cancelledProducts: [],
                                         deliveredProducts: [],
                                     });
-                                    user.save((err, doc) => {
+                                    seller.save((err, doc) => {
                                         if (!err) {
                                             res.status(200).json({
                                                 status: true,
                                                 code: 200,
-                                                message: "User Registered",
-                                                user: doc,
+                                                message: "Seller Registered",
+                                                seller: {...doc._doc, password: null, verificationCode: null},
                                             });
+                                            // this.EmailHandler.sendVerificationEmail(doc.email, doc.verificationCode);
                                         } else {
                                             console.log(err);
                                             res.status(500).json({
@@ -96,42 +96,42 @@ export default class UserController {
     }
 
     // LOGIN USER
-    loginUser() {
+    loginSeller() {
         return (req, res) => {
             try {
-                this.User.findOne({ email: req.body.email }, (err, user) => {
-                    if (!user) {
+                this.Seller.findOne({ email: req.body.email }, (err, seller) => {
+                    if (!seller) {
                         return res.json({
                             code: 404,
-                            message: "User not found",
+                            message: "Seller not found",
                         });
                     }
-                    if (this.bcrypt.compareSync(req.body.password, user.password)) {
+                    if (this.bcrypt.compareSync(req.body.password, seller.password)) {
                         const payload = {
-                            id: user._id,
-                            firstName: user.firstName,
-                            lastName: user.lastName,
-                            email: user.email,
-                            isVerified: user.isVerified,
-                            isAdmin: user.isAdmin,
-                            isActive: user.isActive,
-                            isDeleted: user.isDeleted,
-                            createDate: user.createDate,
-                            updateDate: user.updateDate,
-                            role: user.role,
-                            status: user.status,
-                            address: user.address,
-                            phone: user.phone,
+                            id: seller._id,
+                            firstName: seller.firstName,
+                            lastName: seller.lastName,
+                            email: seller.email,
+                            isVerified: seller.isVerified,
+                            isAdmin: seller.isAdmin,
+                            isActive: seller.isActive,
+                            isDeleted: seller.isDeleted,
+                            createDate: seller.createDate,
+                            updateDate: seller.updateDate,
+                            role: seller.role,
+                            status: seller.status,
+                            address: seller.address,
+                            phone: seller.phone,
                         };
-                        let token = this.jwt.sign(payload, process.env.USER_ACCESS_TOKEN_SECRET, {
+                        let token = this.jwt.sign(payload, `${USER_ACCESS_TOKEN_SECRET}`, {
                             // expiresIn: 1000 * 60 * 60 * 24 * 7,
                         });
                         res.status(200).json({
                             status: true,
                             code: 200,
-                            message: "User Logged In",
-                            user: {
-                                ...user._doc,
+                            message: "Seller Logged In",
+                            seller: {
+                                ...seller._doc,
                                 token,
                             },
                         });
@@ -154,29 +154,327 @@ export default class UserController {
         }
     }
 
+    getSellerProfile() {
+        return (req, res) => {
+            try {
+                this.Seller.findOne({ _id: req.params.id }, (err, seller) => {
+                    if (!seller) {
+                        return res.json({
+                            code: 404,
+                            message: "Seller not found",
+                        });
+                    }
+                    res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "Seller Profile",
+                        seller: seller,
+                    });
+                });
+            } catch (err) {
+                console.log(err);
+                res.status(500).json({
+                    status: false,
+                    code: 500,
+                    message: "Internal Server Error",
+                });
+            }
+        }
+    }
+
+    updateSellerImage() {
+        return (req, res) => {
+            try {
+                this.Seller.findOne({ _id: req.user.id }, (err, seller) => {
+                    if (!seller) {
+                        return res.json({
+                            code: 404,
+                            message: "Seller not found",
+                        });
+                    }
+                    seller.profilePic = req.files[0].imagePath;
+                    seller.save((err, doc) => {
+                        if (!err) {
+                            res.status(200).json({
+                                status: true,
+                                code: 200,
+                                message: "Seller Image Updated",
+                                seller: doc,
+                            });
+                        } else {
+                            console.log(err);
+                            res.status(500).json({
+                                status: false,
+                                code: 500,
+                                message: "Internal Server Error",
+                            });
+                        }
+                    });
+                });
+            } catch (err) {
+                console.log(err);
+                res.status(500).json({
+                    status: false,
+                    code: 500,
+                    message: "Internal Server Error",
+                });
+            }
+        }
+    }
+
+    updateSellerProfile() {
+        return (req, res) => {
+            try {
+                this.Seller.findOneAndUpdate({ _id: req.user.id }, req.body, { new: true }, (err, seller) => {
+                    if (!seller) {
+                        return res.json({
+                            code: 404,
+                            message: "Seller not found",
+                        });
+                    }
+                    res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "Seller Profile Updated",
+                        seller: seller,
+                    });
+                });
+            } catch (err) {
+                console.log(err);
+                res.status(500).json({
+                    status: false,
+                    code: 500,
+                    message: "Internal Server Error",
+                });
+            }
+        }
+    }
+
+    updateSellerPassword() {
+        return (req, res) => {
+            try {
+                this.Seller.findOne({ _id: req.user.id }, (err, seller) => {
+                    if (!seller) {
+                        return res.json({
+                            code: 404,
+                            message: "Seller not found",
+                        });
+                    }
+                    if (this.bcrypt.compareSync(req.body.oldPassword, seller.password)) {
+                        let hashPassword = this.bcrypt.hashSync(req.body.newPassword, 10);
+                        this.Seller.findOneAndUpdate({ _id: req.user.id }, { password: hashPassword }, { new: true }, (err, seller) => {
+                            if (!seller) {
+                                return res.json({
+                                    code: 404,
+                                    message: "Seller not found",
+                                });
+                            }
+                            res.status(200).json({
+                                status: true,
+                                code: 200,
+                                message: "Seller Password Updated",
+                                seller: seller,
+                            });
+                        });
+                    } else {
+                        return res.json({
+                            code: 404,
+                            message: "Wrong Password",
+                        });
+                    }
+                });
+            } catch (err) {
+                console.log(err);
+                res.status(500).json({
+                    status: false,
+                    code: 500,
+                    message: "Internal Server Error",
+                });
+            }
+        }
+    }
+
+    updateSellerEmail() {
+        return (req, res) => {
+            try {
+                this.Seller.findOne({ _id: req.user.id }, (err, seller) => {
+                    if (!seller) {
+                        return res.json({
+                            code: 404,
+                            message: "Seller not found",
+                        });
+                    }
+                    if (this.bcrypt.compareSync(req.body.password, seller.password)) {
+                        this.Seller.findOneAndUpdate({ _id: req.user.id }, { email: req.body.email }, { new: true }, (err, seller) => {
+                            if (!seller) {
+                                return res.json({
+                                    code: 404,
+                                    message: "Seller not found",
+                                });
+                            }
+                            res.status(200).json({
+                                status: true,
+                                code: 200,
+                                message: "Seller Email Updated",
+                                seller: seller,
+                            });
+                        });
+                    } else {
+                        return res.json({
+                            code: 404,
+                            message: "Wrong Password",
+                        });
+                    }
+                });
+            } catch (err) {
+                console.log(err);
+                res.status(500).json({
+                    status: false,
+                    code: 500,
+                    message: "Internal Server Error",
+                });
+            }
+        }
+    }
+
+    updateSellerPhone() {
+        return (req, res) => {
+            try {
+                this.Seller.findOne({ _id: req.user.id }, (err, seller) => {
+                    if (!seller) {
+                        return res.json({
+                            code: 404,
+                            message: "Seller not found",
+                        });
+                    }
+                    if (this.bcrypt.compareSync(req.body.password, seller.password)) {
+                        this.Seller.findOneAndUpdate({ _id: req.user.id }, { phone: req.body.phone }, { new: true }, (err, seller) => {
+                            if (!seller) {
+                                return res.json({
+                                    code: 404,
+                                    message: "Seller not found",
+                                });
+                            }
+                            res.status(200).json({
+                                status: true,
+                                code: 200,
+                                message: "Seller Phone Updated",
+                                seller: seller,
+                            });
+                        });
+                    } else {
+                        return res.json({
+                            code: 404,
+                            message: "Wrong Password",
+                        });
+                    }
+                });
+            } catch (err) {
+                console.log(err);
+                res.status(500).json({
+                    status: false,
+                    code: 500,
+                    message: "Internal Server Error",
+                });
+            }
+        }
+    }
+
+    updateSellerAddress() {
+        return (req, res) => {
+            try {
+                this.Seller.findOne({ _id: req.user.id }, (err, seller) => {
+                    if (!seller) {
+                        return res.json({
+                            code: 404,
+                            message: "Seller not found",
+                        });
+                    }
+                    this.Seller.findOneAndUpdate({ _id: req.user.id }, { address: req.body.address }, { new: true }, (err, seller) => {
+                        if (!seller) {
+                            return res.json({
+                                code: 404,
+                                message: "Seller not found",
+                            });
+                        }
+                        res.status(200).json({
+                            status: true,
+                            code: 200,
+                            message: "Seller Address Updated",
+                            seller: seller,
+                        });
+                    });
+                });
+            } catch (err) {
+                console.log(err);
+                res.status(500).json({
+                    status: false,
+                    code: 500,
+                    message: "Internal Server Error",
+                });
+            }
+        }
+    }
+
+    updateSellerProfileImage() {
+        return (req, res) => {
+            try {
+                this.Seller.findOne({ _id: req.user.id }, (err, seller) => {
+                    if (!seller) {
+                        return res.json({
+                            code: 404,
+                            message: "Seller not found",
+                        });
+                    }
+                    this.Seller.findOneAndUpdate({ _id: req.user.id }, { profileImage: req.body.profileImage }, { new: true }, (err, seller) => {
+                        if (!seller) {
+                            return res.json({
+                                code: 404,
+                                message: "Seller not found",
+                            });
+                        }
+                        res.status(200).json({
+                            status: true,
+                            code: 200,
+                            message: "Seller Profile Image Updated",
+                            seller: seller,
+                        });
+                    });
+                });
+            } catch (err) {
+                console.log(err);
+                res.status(500).json({
+                    status: false,
+                    code: 500,
+                    message: "Internal Server Error",
+                });
+            }
+        }
+    }
+
     // SEND VERIFICATION EMAIL
     sendVerificationEmail() {
         return (req, res) => {
             const { email } = req.body;
-            this.User.findOne({ email: email }, (err, user) => {
-                if ( !user ) {
+            this.Seller.findOne({ email: email }, (err, seller) => {
+                if ( !seller ) {
                     return res.json({
                         status: false,
                         code: 404,
-                        message: "User not found",
+                        message: "Seller not found",
                     });
                 }
                 const subject = "Verify your email";
                 const code = this.generateVerificationCode();
                 this.EmailHandler.sendVerificationEmail({ email, subject, code });
-                user.verificationCode = code;
-                user.save((err, doc) => {
+                seller.verificationCode = code;
+                seller.save((err, doc) => {
                     if (!err) {
                         res.status(200).json({
                             status: true,
                             code: 200,
                             message: "Verification code sent",
-                            user: doc,
+                            seller: doc,
                         });
                     } else {
                         console.log(err);
@@ -192,24 +490,24 @@ export default class UserController {
     }
 
     // VERIFY USER EMAIL
-    verifyUserEmail() {
+    verifySellerEmail() {
         return (req, res) => {
-            this.User.findOne({ email: req.body.email }, (err, user) => {
-                if (!user) {
+            this.Seller.findOne({ email: req.body.email }, (err, seller) => {
+                if (!seller) {
                     return res.json({
                         code: 404,
-                        message: "User not found",
+                        message: "Seller not found",
                     });
                 }
-                if (user.verificationCode === req.body.verificationCode) {
-                    user.isVerified = true;
-                    user.save((err, doc) => {
+                if (seller.verificationCode === req.body.verificationCode) {
+                    seller.isVerified = true;
+                    seller.save((err, doc) => {
                         if (!err) {
                             res.status(200).json({
                                 status: true,
                                 code: 200,
-                                message: "User Verified",
-                                user: doc,
+                                message: "Seller Verified",
+                                seller: doc,
                             });
                         } else {
                             console.log(err);
@@ -220,29 +518,34 @@ export default class UserController {
                             });
                         }
                     });
+                } else {
+                    return res.json({
+                        code: 404,
+                        message: "Wrong verification code",
+                    });
                 }
             });
         }
     };
 
     //  GET ALL USER DATA
-    loadAllUsers = () => {
+    loadAllSellers = () => {
         return (req, res) => {
             try {
-                this.User.find({}, (err, data) => {
+                this.Seller.find({}, (err, data) => {
                     if (!err) {
                         res.status(200).json({
                             status: true,
                             code: 200,
-                            message: "User data loaded successfully",
-                            loadAllUsers: data,
+                            message: "Seller data loaded successfully",
+                            loadAllSellers: data,
                         });
                     } else {
                         console.log(err);
                         res.status(500).json({
                             status: false,
                             code: 500,
-                            message: "Error loading user data",
+                            message: "Error loading seller data",
                         });
                     }
                 });
@@ -258,23 +561,23 @@ export default class UserController {
     };
 
     //  GET SINGLE USER DATA
-    getSingleUserData = () => {
+    getSingleSellerData = () => {
         return (req, res) => {
             try {
-                this.User.findById(req.params.id, (err, data) => {
+                this.Seller.findById(req.params.id, (err, data) => {
                     if (!err) {
                         res.status(200).json({
                             status: true,
                             code: 200,
-                            message: "User data loaded successfully",
-                            user: data,
+                            message: "Seller data loaded successfully",
+                            seller: data,
                         });
                     } else {
                         console.log(err);
                         res.status(404).json({
                             status: false,
                             code: 404,
-                            message: "User not found",
+                            message: "Seller not found",
                         });
                     }
                 });
@@ -283,31 +586,31 @@ export default class UserController {
                 res.status(500).json({
                     status: false,
                     code: 500,
-                    message: "User not found",
+                    message: "Seller not found",
                 });
             }
         };
     };
 
     //  EDIT SINGLE USER DATA
-    editSingleUserData = () => {
+    editSingleSellerData = () => {
         return (req, res) => {
             try {
                 console.log(req.body);
-                this.User.findByIdAndUpdate(req.params.id, req.body, (err, data) => {
+                this.Seller.findByIdAndUpdate(req.params.id, req.body, (err, data) => {
                     if (!err) {
                         res.status(200).json({
                             status: true,
                             code: 200,
-                            message: "User data updated successfully",
-                            user: data,
+                            message: "Seller data updated successfully",
+                            seller: data,
                         });
                     } else {
                         console.log(err);
                         res.status(500).json({
                             status: false,
                             code: 500,
-                            message: "User data not updated",
+                            message: "Seller data not updated",
                         });
                     }
                 });
@@ -316,7 +619,7 @@ export default class UserController {
                 res.status(500).json({
                     status: false,
                     code: 500,
-                    message: "User data not updated",
+                    message: "Seller data not updated",
                 });
             }
         };
@@ -326,7 +629,7 @@ export default class UserController {
     resetPassword = () => {
         return (req, res) => {
             try {
-                this.User.findByIdAndUpdate(req.body.id, {
+                this.Seller.findByIdAndUpdate(req.body.id, {
                     password: req.body.password,
                     confirmPassword: req.body.confirmPassword,
                 }, (err, data) => {
@@ -357,25 +660,25 @@ export default class UserController {
         };
     }
 
-    logOutUser = () => {
+    logOutSeller = () => {
         return (req, res) => {
             try {
-                this.User.findByIdAndUpdate(req.body.id, {
+                this.Seller.findByIdAndUpdate(req.body.id, {
                     isActive: false,
                 }, (err, data) => {
                     if (!err) {
                         res.status(200).json({
                             status: true,
                             code: 200,
-                            message: "User logged out successfully",
-                            logOutUser: data,
+                            message: "Seller logged out successfully",
+                            logOutSeller: data,
                         });
                     } else {
                         console.log(err);
                         res.status(500).json({
                             status: false,
                             code: 500,
-                            message: "User not logged out",
+                            message: "Seller not logged out",
                         });
                     }
                 })
@@ -384,11 +687,141 @@ export default class UserController {
                 res.status(500).json({
                     status: false,
                     code: 500,
-                    message: "User not logged out",
+                    message: "Seller not logged out",
                 });
             }
         };
     }
+
+    // Save Product in Cart 
+    saveProductInCart = () => {
+        return (req, res) => {
+            try {
+                this.Seller.findByIdAndUpdate(req.user.id, {
+                    $push: {
+                        cart: req.params.productId,
+                    },
+                }, (err, data) => {
+                    if (!err) {
+                        res.status(200).json({
+                            status: true,
+                            code: 200,
+                            message: "Product added to cart successfully",
+                            user: data,
+                        });
+                    } else {
+                        console.log(err);
+                        res.status(500).json({
+                            status: false,
+                            code: 500,
+                            message: "Product not added to cart",
+                        });
+                    }
+                });
+            } catch (err) {
+                console.log(err);
+                res.status(500).json({
+                    status: false,
+                    code: 500,
+                    message: "Product not added to cart",
+                });
+            }
+        }
+    }
+
+    // Remove Product from Cart
+    removeProductFromCart = () => {
+        return (req, res) => {
+            try {
+                this.Seller.findByIdAndUpdate(req.user.id, {
+                    $pull: {
+                        cart: req.params.productId,
+                    },
+                }, (err, data) => {
+                    if (!err) {
+                        res.status(200).json({
+                            status: true,
+                            code: 200,
+                            message: "Product removed from cart successfully",
+                            user: data,
+                        });
+                    } else {
+                        console.log(err);
+                        res.status(500).json({
+                            status: false,
+                            code: 500,
+                            message: "Product not removed from cart",
+                        });
+                    }
+                });
+            } catch (err) {
+                console.log(err);
+                res.status(500).json({
+                    status: false,
+                    code: 500,
+                    message: "Product not removed from cart",
+                });
+            }
+        }
+    }
+
+    // Get Cart Data
+    getCartData = () => {
+        return (req, res) => {
+            try {
+                this.Seller.findById(req.user.id, (err, data) => {
+                    if (!err) {
+                        if (data.cart === undefined || data.cart.length === 0) {
+                            return res.status(200).json({
+                                status: true,
+                                code: 200,
+                                message: "Cart is empty",
+                                cart: [],
+                            });
+                        }
+                        console.log(data.cart);
+
+                        const final = async () => {
+                            var products = [];
+
+                            await data.cart.map(async (item) => {
+                                var product = await this.Product.findById(item);
+                                products.push(product);
+
+                                if (products.length === data.cart.length) {
+                                    res.status(200).json({
+                                        status: true,
+                                        code: 200,
+                                        message: "Cart data loaded successfully",
+                                        cart: products,
+                                    });
+                                }
+                            });
+                        }
+
+                        return final();
+                    } else {
+                        console.log(err);
+                        res.status(500).json({
+                            status: false,
+                            code: 500,
+                            message: "Cart data not loaded",
+                        });
+                    }
+                });
+
+            } catch (err) {
+                console.log(err);
+                res.status(500).json({
+                    status: false,
+                    code: 500,
+                    message: "Cart data not loaded",
+                });
+            }
+        }
+    }
+
+
 
     generateVerificationCode = () => {
         return Math.floor(Math.random() * 1000000);

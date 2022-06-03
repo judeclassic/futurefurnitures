@@ -1,63 +1,129 @@
 //@ts-check
 
-const router = ({ Router, UserController, User, Authenticate, EmailHandler, bcrypt, jwt}) => {
+const router = ({ Router, UserController, Seller, SellerProduct, Authenticate, EmailHandler, bcrypt, jwt, uploader, Product }) => {
     const router = Router();
 
-    const userController = new UserController({ User, EmailHandler, bcrypt, jwt });
-    const { clickVerification, verifyUserToken } = new Authenticate({ User, bcrypt, jwt });
+    const userController = new UserController({ Seller, EmailHandler, SellerProduct, Product, bcrypt, jwt });
+    const { verifySellerToken } = new Authenticate({ Seller, bcrypt, jwt });
 
-    // User Login
+    // Seller Login
     router.post(
         "/signIn",
-        userController.loginUser()
+        userController.loginSeller()
     );
 
-    // User Signup
+    // Seller Signup
     router.post(
         "/signUp",
-        userController.registerUser()
+        userController.registerSeller()
     );
 
-    // Get Single User Data
+    // Seller Profile
     router.get(
-        '/getSingleUserData/:id',
-        verifyUserToken(),
-        userController.getSingleUserData()
+        "/profile/:id",
+         verifySellerToken(),
+        userController.getSellerProfile()
     );
 
-    //  Edit Single User Data
+    // Seller Profile Update
     router.put(
-        '/editSingleUserData/:id',
-        verifyUserToken(),
-        userController.editSingleUserData()
+        "/profile",
+         verifySellerToken(),
+        userController.updateSellerProfile()
+    );
+
+    // Seller Profile Update
+    router.put(
+        "/profile/password",
+         verifySellerToken(),
+        userController.updateSellerPassword()
+    );
+
+    // Seller Profile Update
+    router.put(
+        "/profile/email",
+         verifySellerToken(),
+        userController.updateSellerEmail()
+    );
+
+    // Seller Profile Update
+    router.put(
+        "/profile/phone",
+         verifySellerToken(),
+        userController.updateSellerPhone()
+    );
+
+    // Seller Profile Update
+    router.put(
+        "/profile/address",
+         verifySellerToken(),
+        userController.updateSellerAddress()
+    );
+
+    // Update Seller Profile Image
+    router.put(
+        "/profile/image",
+         verifySellerToken(),
+        uploader,
+        userController.updateSellerImage()
     );
 
     // Send Verification Email
     router.post(
-        '/sendVerificationEmail',
-        verifyUserToken(),
+        "/verifyEmailByCodeRequest",
+         verifySellerToken(),
         userController.sendVerificationEmail()
     );
 
-    // Verify User Email
+    // Verify Email
     router.post(
-        '/verifyUserEmail',
-        clickVerification(),
-        userController.verifyUserEmail()
+        "/confirmEmailVerificationCode",
+        userController.verifySellerEmail()
     );
 
-    // Reset Password
-    router.post(
-        "/resetPassword",
-        clickVerification(),
-        userController.resetPassword()
-    )
-
-    // Logout Out
+    // Load All Sellers
     router.get(
-        "/logOut",
-        userController.logOutUser()
+        "/all",
+        userController.loadAllSellers()
     );
+
+    // View Cart
+    router.get(
+        "/cart",
+        verifySellerToken(),
+        userController.getCartData()
+    );
+
+    // Add To Cart
+    router.post(
+        "/cart/:productId",
+        verifySellerToken(),
+        userController.saveProductInCart()
+    );
+
+    // Remove From Cart
+    router.delete(
+        "/cart/:productId",
+        verifySellerToken(),
+        userController.removeProductFromCart()
+    );
+
+    
+
+    // Get Transaction By SellerId
+    // router.get(
+    //     "/transactions/:sellerId/:id",
+    //      verifySellerToken(),
+    //     userController.getTransactionsBySellerId()
+    // );
+
+    // // Get Transaction By SellerId
+    // router.get(
+    //     "/transactions/:sellerId",
+    //      verifySellerToken(),
+    //     userController.getTransactionsBySellerId()
+    // );
+
 
     return router;
 }

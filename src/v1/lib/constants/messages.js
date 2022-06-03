@@ -1,4 +1,6 @@
 
+const APP_URL = process.env.APP_URL || "https://thi-server.herokuapp.com";
+
 export default {
     email: {
         subscribe: {
@@ -166,7 +168,7 @@ export default {
                 <p>Subscribe to our newsletter and get the latest news and updates about our products. We will never spam you.</p>
                 <p>
                     <a href="
-                        ${process.env.APP_URL}/api/v1/subscribe
+                        ${APP_URL}/api/v1/subscribe
                     ">Subscribe</a>
                 </p>
             `;
@@ -178,7 +180,7 @@ export default {
                 <p>Subscribe to our newsletter and get the latest news and updates about our products. We will never spam you.</p>
                 <p>
                     <a href="
-                        ${process.env.APP_URL}/api/v1/unsubscribe
+                        ${APP_URL}/api/v1/unsubscribe
                     ">Unsubscribe</a>
                 </p>
             `;
@@ -218,7 +220,7 @@ export default {
                         </tr>
                     <p>
                         <a href="
-                            ${process.env.APP_URL}/api/v1/order/${productId}
+                            ${APP_URL}/api/v1/order/${productId}
                         ">View Order</a>
                     </p>
                 `;
@@ -242,7 +244,7 @@ export default {
                         </tr>
                     <p>
                         <a href="
-                            ${process.env.APP_URL}/api/v1/order/${productId}
+                            ${APP_URL}/api/v1/order/${productId}
                         ">View Order</a>
                     </p>
                 `;
@@ -266,7 +268,7 @@ export default {
                         </tr>
                     <p>
                         <a href="
-                            ${process.env.APP_URL}/api/v1/order/${productId}
+                            ${APP_URL}/api/v1/order/${productId}
                         ">View Order</a>
                     </p>
                 `;
@@ -290,7 +292,7 @@ export default {
                         </tr>
                     <p>
                         <a href="
-                            ${process.env.APP_URL}/api/v1/order/${productId}
+                            ${APP_URL}/api/v1/order/${productId}
                         ">View Order</a>
                     </p>
                 `;

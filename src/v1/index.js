@@ -10,7 +10,7 @@ import sellerRouter from './routes/seller';
 
 import ProductController from "./controllers/product";
 import SubscriptionController from "./controllers/subscribe";
-import UserController from "./controllers/user";
+import UserController from "./controllers/user/index";
 import OrderController from "./controllers/order";
 import PaymentController from "./controllers/payment";
 import VendorController from "./controllers/vendor";
@@ -57,15 +57,15 @@ export const theHouseInteriorApp = function ({app, server}) {
     app.use(express.json());
     
     app.use("/v1/api/email/", subscribeRouter({ Router, SubscriptionController, Subscription, EmailHandler }));
-    app.use('/v1/api/user', userRouter({ Router, UserController, Authenticate, User, EmailHandler, bcrypt, jwt }));
+    app.use('/v1/api/user', userRouter({ Router, UserController, Seller, SellerProduct, Product, Authenticate, EmailHandler, bcrypt, jwt, uploader }));
     app.use('/v1/api/product', productRouter({ Router, ProductController, Authenticate, Product, User, EmailHandler, messages, bcrypt, jwt, uploader }));
-    app.use('/v1/api/vendor', vendorRouter({Router, VendorController, Authenticate, Vendor, User, service, EmailHandler, PaymentHandler, bcrypt, jwt, Logger, uploader}));
-    app.use('/v1/api/service', vendorRouter({Router, VendorController, Authenticate, Vendor, User, service, EmailHandler, PaymentHandler, bcrypt, jwt, Logger, uploader}));
+    app.use('/v1/api/vendor', vendorRouter({Router, VendorController, Authenticate, Vendor, User, service, EmailHandler, PaymentHandler, bcrypt, jwt, Logger, uploader }));
+    app.use('/v1/api/service', vendorRouter({Router, VendorController, Authenticate, Vendor, User, service, EmailHandler, PaymentHandler, bcrypt, jwt, Logger, uploader }));
     
     app.use('/v1/api/order', orderRouter({ Router, OrderController, Authenticate, Order, User, Product, EmailHandler, messages, bcrypt, jwt }));
     app.use('/v1/api/payment', paymentRouter({ Router, PaymentController, Authenticate, Product, User, EmailHandler, PaymentHandler, messages, bcrypt, jwt }));
 
-    app.use('/v1/api/seller', sellerRouter({ Router, SellerController, Seller, SellerProduct, Authenticate, EmailHandler, bcrypt, jwt, uploader}) );
+    app.use('/v1/api/seller', sellerRouter({ Router, SellerController, Seller, SellerProduct, Authenticate, EmailHandler, bcrypt, jwt, uploader }));
 
 
     /*

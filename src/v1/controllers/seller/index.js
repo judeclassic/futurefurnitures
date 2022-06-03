@@ -2,6 +2,8 @@
 import ProductController from "./product";
 import Transaction from "./finance";
 
+const USER_ACCESS_TOKEN_SECRET = process.env.USER_ACCESS_TOKEN_SECRET || 'rirriurh849g498gyh4iggntfjnvo7';
+
 export default class SellerController extends ProductController {
 
     constructor({ Seller, EmailHandler, SellerProduct, bcrypt, jwt }) {
@@ -123,7 +125,7 @@ export default class SellerController extends ProductController {
                             address: seller.address,
                             phone: seller.phone,
                         };
-                        let token = this.jwt.sign(payload, `${process.env.USER_ACCESS_TOKEN_SECRET}`, {
+                        let token = this.jwt.sign(payload, `${USER_ACCESS_TOKEN_SECRET}`, {
                             // expiresIn: 1000 * 60 * 60 * 24 * 7,
                         });
                         res.status(200).json({

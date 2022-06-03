@@ -1,7 +1,9 @@
 require('dotenv').config({ path: "./.env" });
+const MJ_APIKEY_PUBLIC = process.env.MJ_APIKEY_PUBLIC || "958ce269cb616232310461cc1ca58f4f";
+const MJ_APIKEY_PRIVATE = process.env.MJ_APIKEY_PRIVATE || "d84991decaecfd1a5c13d8d60abfc631";
 
 const mailjet = require ('node-mailjet')
-	.connect(process.env.MJ_APIKEY_PUBLIC, process.env.MJ_APIKEY_PRIVATE)
+	.connect(MJ_APIKEY_PUBLIC, MJ_APIKEY_PRIVATE)
 const request = mailjet
 	.post("send", {'version': 'v3.1'})
 	.request({
