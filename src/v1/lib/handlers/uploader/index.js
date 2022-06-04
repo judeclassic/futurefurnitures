@@ -24,6 +24,7 @@ MyCustomStorage.prototype._handleFile = function _handleFile (req, file, cb) {
 }
 
 MyCustomStorage.prototype._removeFile = function _removeFile (req, file, cb) {
+    console.log(file)
     cloudinary.uploader.destroy(file.filename, function (error, result) {
         if (error) {
             return cb(error);
@@ -35,7 +36,7 @@ MyCustomStorage.prototype._removeFile = function _removeFile (req, file, cb) {
 const storage = new MyCustomStorage();
 
 
-const multerUploads = multer({ storage }).array('image', 12);
+const multerUploads = multer({ storage }).any();
 
 export default multerUploads;
 

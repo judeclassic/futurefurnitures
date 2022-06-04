@@ -41,7 +41,7 @@ class SellerController {
                         price,
                         discount,
                         color,
-                        size: JSON.parse(size),
+                        size,
                         dimensions,
                         weight,
                         seller,
@@ -59,14 +59,15 @@ class SellerController {
                         isActive,
                     });
 
-                    // await product.save();
+                    await product.save();
                     return res.status(200).json({
                         status: true,
                         code: 200,
+                        message: "SUCCESSFULLY UPLOADED",
                         data: product,
                     });
                 } catch (error) {
-                    // console.log(error);
+                    console.log(error);
                     return res.status(500).json({
                         status: false,
                         code: 500,

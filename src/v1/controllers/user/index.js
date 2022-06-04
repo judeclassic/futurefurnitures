@@ -94,7 +94,7 @@ export default class UserController {
                 res.status(500).json({
                     status: false,
                     code: 500,
-                    message: "Internal Server Error",
+                    message: err,
                 });
             }
         }
@@ -158,7 +158,7 @@ export default class UserController {
                 res.status(500).json({
                     status: false,
                     code: 500,
-                    message: "Internal Server Error",
+                    message: err,
                 });
             }
         }
@@ -191,7 +191,7 @@ export default class UserController {
                 res.status(500).json({
                     status: false,
                     code: 500,
-                    message: "Internal Server Error",
+                    message: err,
                 });
             }
         }
@@ -221,7 +221,7 @@ export default class UserController {
                             res.status(500).json({
                                 status: false,
                                 code: 500,
-                                message: "Internal Server Error",
+                                message: err,
                             });
                         }
                     });
@@ -231,7 +231,7 @@ export default class UserController {
                 res.status(500).json({
                     status: false,
                     code: 500,
-                    message: "Internal Server Error",
+                    message: err,
                 });
             }
         }
@@ -259,7 +259,7 @@ export default class UserController {
                 res.status(500).json({
                     status: false,
                     code: 500,
-                    message: "Internal Server Error",
+                    message: err,
                 });
             }
         }
@@ -303,7 +303,7 @@ export default class UserController {
                 res.status(500).json({
                     status: false,
                     code: 500,
-                    message: "Internal Server Error",
+                    message: err,
                 });
             }
         }
@@ -346,7 +346,7 @@ export default class UserController {
                 res.status(500).json({
                     status: false,
                     code: 500,
-                    message: "Internal Server Error",
+                    message: err,
                 });
             }
         }
@@ -389,7 +389,7 @@ export default class UserController {
                 res.status(500).json({
                     status: false,
                     code: 500,
-                    message: "Internal Server Error",
+                    message: err,
                 });
             }
         }
@@ -425,7 +425,7 @@ export default class UserController {
                 res.status(500).json({
                     status: false,
                     code: 500,
-                    message: "Internal Server Error",
+                    message: err,
                 });
             }
         }
@@ -461,7 +461,7 @@ export default class UserController {
                 res.status(500).json({
                     status: false,
                     code: 500,
-                    message: "Internal Server Error",
+                    message: err,
                 });
             }
         }
@@ -496,7 +496,7 @@ export default class UserController {
                         res.status(500).json({
                             status: false,
                             code: 500,
-                            message: "Internal Server Error",
+                            message: err,
                         });
                     }
                 });
@@ -529,7 +529,7 @@ export default class UserController {
                             res.status(500).json({
                                 status: false,
                                 code: 500,
-                                message: "Internal Server Error",
+                                message: err,
                             });
                         }
                     });
@@ -775,6 +775,7 @@ export default class UserController {
                     status: false,
                     code: 500,
                     message: "Product not removed from cart",
+                    error: err
                 });
             }
         }
