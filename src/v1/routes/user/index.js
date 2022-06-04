@@ -1,127 +1,127 @@
 //@ts-check
 
-const router = ({ Router, UserController, Seller, SellerProduct, Authenticate, EmailHandler, bcrypt, jwt, uploader, Product }) => {
+const router = ({ Router, UserController, Seller, UserProduct, Authenticate, EmailHandler, bcrypt, jwt, uploader, Product }) => {
     const router = Router();
 
-    const userController = new UserController({ Seller, EmailHandler, SellerProduct, Product, bcrypt, jwt });
-    const { verifySellerToken } = new Authenticate({ Seller, bcrypt, jwt });
+    const userController = new UserController({ User: Seller, EmailHandler, UserProduct, Product, bcrypt, jwt });
+    const { verifyUserToken } = new Authenticate({ User: Seller, bcrypt, jwt });
 
-    // Seller Login
+    // User Login
     router.post(
         "/signIn",
-        userController.loginSeller()
+        userController.loginUser()
     );
 
-    // Seller Signup
+    // User Signup
     router.post(
         "/signUp",
-        userController.registerSeller()
+        userController.registerUser()
     );
 
-    // Seller Profile
+    // User Profile
     router.get(
         "/profile/:id",
-         verifySellerToken(),
-        userController.getSellerProfile()
+         verifyUserToken(),
+        userController.getUserProfile()
     );
 
-    // Seller Profile Update
+    // User Profile Update
     router.put(
         "/profile",
-         verifySellerToken(),
-        userController.updateSellerProfile()
+         verifyUserToken(),
+        userController.updateUserProfile()
     );
 
-    // Seller Profile Update
+    // User Profile Update
     router.put(
         "/profile/password",
-         verifySellerToken(),
-        userController.updateSellerPassword()
+         verifyUserToken(),
+        userController.updateUserPassword()
     );
 
-    // Seller Profile Update
+    // User Profile Update
     router.put(
         "/profile/email",
-         verifySellerToken(),
-        userController.updateSellerEmail()
+         verifyUserToken(),
+        userController.updateUserEmail()
     );
 
-    // Seller Profile Update
+    // User Profile Update
     router.put(
         "/profile/phone",
-         verifySellerToken(),
-        userController.updateSellerPhone()
+         verifyUserToken(),
+        userController.updateUserPhone()
     );
 
-    // Seller Profile Update
+    // User Profile Update
     router.put(
         "/profile/address",
-         verifySellerToken(),
-        userController.updateSellerAddress()
+         verifyUserToken(),
+        userController.updateUserAddress()
     );
 
-    // Update Seller Profile Image
+    // Update User Profile Image
     router.put(
         "/profile/image",
-         verifySellerToken(),
+         verifyUserToken(),
         uploader,
-        userController.updateSellerImage()
+        userController.updateUserImage()
     );
 
     // Send Verification Email
     router.post(
         "/verifyEmailByCodeRequest",
-         verifySellerToken(),
+         verifyUserToken(),
         userController.sendVerificationEmail()
     );
 
     // Verify Email
     router.post(
         "/confirmEmailVerificationCode",
-        userController.verifySellerEmail()
+        userController.verifyUserEmail()
     );
 
-    // Load All Sellers
+    // Load All Users
     router.get(
         "/all",
-        userController.loadAllSellers()
+        userController.loadAllUsers()
     );
 
     // View Cart
     router.get(
         "/cart",
-        verifySellerToken(),
+        verifyUserToken(),
         userController.getCartData()
     );
 
     // Add To Cart
     router.post(
         "/cart/:productId",
-        verifySellerToken(),
+        verifyUserToken(),
         userController.saveProductInCart()
     );
 
     // Remove From Cart
     router.delete(
         "/cart/:productId",
-        verifySellerToken(),
+        verifyUserToken(),
         userController.removeProductFromCart()
     );
 
     
 
-    // Get Transaction By SellerId
+    // Get Transaction By UserId
     // router.get(
     //     "/transactions/:sellerId/:id",
-    //      verifySellerToken(),
-    //     userController.getTransactionsBySellerId()
+    //      verifyUserToken(),
+    //     userController.getTransactionsByUserId()
     // );
 
-    // // Get Transaction By SellerId
+    // // Get Transaction By UserId
     // router.get(
     //     "/transactions/:sellerId",
-    //      verifySellerToken(),
-    //     userController.getTransactionsBySellerId()
+    //      verifyUserToken(),
+    //     userController.getTransactionsByUserId()
     // );
 
 

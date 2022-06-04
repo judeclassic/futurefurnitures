@@ -4,8 +4,8 @@ const USER_ACCESS_TOKEN_SECRET = process.env.USER_ACCESS_TOKEN_SECRET || 'rirriu
 
 export default class UserController {
 
-    constructor({ Seller, EmailHandler, Product, bcrypt, jwt }) {
-        this.Seller = Seller;
+    constructor({ User, EmailHandler, Product, bcrypt, jwt }) {
+        this.User = User;
         this.EmailHandler = EmailHandler;
         this.Product = Product;
         this.bcrypt = bcrypt;
@@ -17,13 +17,18 @@ export default class UserController {
     }
 
     // REGISTER USER
-    registerSeller = () => {  
+    registerUser = () => {  
         return (req, res) => {
             try{
                 let hashPassword = this.bcrypt.hashSync(req.body.password, 10);
                 let code = this.generateVerificationCode();
+                if (!req.body) {
+                    return res.status(400).send({
+                        message: 'Content can not be empty!'
+                    });
+                }
 
-                this.Seller.findOne({
+                this.User.findOne({
                     email: req.body.email,
                 }, (err, seller) => {
                     if (seller) {
@@ -33,7 +38,7 @@ export default class UserController {
                             message: "Email already exists",
                         });
                     } else {
-                        this.Seller.findOne({
+                        this.User.findOne({
                             phone: req.body.phone,
                             }, (err, seller) => {
                                 if (seller) {
@@ -43,7 +48,7 @@ export default class UserController {
                                         message: "Phone number already exists",
                                     });
                                 } else {
-                                    let seller = new this.Seller({
+                                    let seller = new this.User({
                                         name: req.body.name,
                                         email: req.body.email,
                                         password: hashPassword,
@@ -67,16 +72,16 @@ export default class UserController {
                                             res.status(200).json({
                                                 status: true,
                                                 code: 200,
-                                                message: "Seller Registered",
+                                                message: "User Registered",
                                                 seller: {...doc._doc, password: null, verificationCode: null},
                                             });
-                                            // this.EmailHandler.sendVerificationEmail(doc.email, doc.verificationCode);
+                                            this.EmailHandler.sendVerificationEmail(doc.email, doc.verificationCode);
                                         } else {
                                             console.log(err);
                                             res.status(500).json({
                                                 status: false,
-                                                code: 500,
-                                                message: "Internal Server Error",
+                                                code: 400,
+                                                message: err,
                                             });
                                         }
                                     });
@@ -96,14 +101,19 @@ export default class UserController {
     }
 
     // LOGIN USER
-    loginSeller() {
+    loginUser() {
         return (req, res) => {
+            if (!req.body) {
+                return res.status(400).send({
+                    message: 'Content can not be empty!'
+                });
+            }
             try {
-                this.Seller.findOne({ email: req.body.email }, (err, seller) => {
+                this.User.findOne({ email: req.body.email }, (err, seller) => {
                     if (!seller) {
                         return res.json({
                             code: 404,
-                            message: "Seller not found",
+                            message: "User not found",
                         });
                     }
                     if (this.bcrypt.compareSync(req.body.password, seller.password)) {
@@ -129,7 +139,7 @@ export default class UserController {
                         res.status(200).json({
                             status: true,
                             code: 200,
-                            message: "Seller Logged In",
+                            message: "User Logged In",
                             seller: {
                                 ...seller._doc,
                                 token,
@@ -154,20 +164,25 @@ export default class UserController {
         }
     }
 
-    getSellerProfile() {
+    getUserProfile() {
         return (req, res) => {
             try {
-                this.Seller.findOne({ _id: req.params.id }, (err, seller) => {
+                if (!req.body) {
+                    return res.status(400).send({
+                        message: 'Content can not be empty!'
+                    });
+                }
+                this.User.findOne({ _id: req.params.id }, (err, seller) => {
                     if (!seller) {
                         return res.json({
                             code: 404,
-                            message: "Seller not found",
+                            message: "User not found",
                         });
                     }
                     res.status(200).json({
                         status: true,
                         code: 200,
-                        message: "Seller Profile",
+                        message: "User Profile",
                         seller: seller,
                     });
                 });
@@ -182,14 +197,14 @@ export default class UserController {
         }
     }
 
-    updateSellerImage() {
+    updateUserImage() {
         return (req, res) => {
             try {
-                this.Seller.findOne({ _id: req.user.id }, (err, seller) => {
+                this.User.findOne({ _id: req.user.id }, (err, seller) => {
                     if (!seller) {
                         return res.json({
                             code: 404,
-                            message: "Seller not found",
+                            message: "User not found",
                         });
                     }
                     seller.profilePic = req.files[0].imagePath;
@@ -198,7 +213,7 @@ export default class UserController {
                             res.status(200).json({
                                 status: true,
                                 code: 200,
-                                message: "Seller Image Updated",
+                                message: "User Image Updated",
                                 seller: doc,
                             });
                         } else {
@@ -222,20 +237,20 @@ export default class UserController {
         }
     }
 
-    updateSellerProfile() {
+    updateUserProfile() {
         return (req, res) => {
             try {
-                this.Seller.findOneAndUpdate({ _id: req.user.id }, req.body, { new: true }, (err, seller) => {
+                this.User.findOneAndUpdate({ _id: req.user.id }, req.body, { new: true }, (err, seller) => {
                     if (!seller) {
                         return res.json({
                             code: 404,
-                            message: "Seller not found",
+                            message: "User not found",
                         });
                     }
                     res.status(200).json({
                         status: true,
                         code: 200,
-                        message: "Seller Profile Updated",
+                        message: "User Profile Updated",
                         seller: seller,
                     });
                 });
@@ -250,29 +265,29 @@ export default class UserController {
         }
     }
 
-    updateSellerPassword() {
+    updateUserPassword() {
         return (req, res) => {
             try {
-                this.Seller.findOne({ _id: req.user.id }, (err, seller) => {
+                this.User.findOne({ _id: req.user.id }, (err, seller) => {
                     if (!seller) {
                         return res.json({
                             code: 404,
-                            message: "Seller not found",
+                            message: "User not found",
                         });
                     }
                     if (this.bcrypt.compareSync(req.body.oldPassword, seller.password)) {
                         let hashPassword = this.bcrypt.hashSync(req.body.newPassword, 10);
-                        this.Seller.findOneAndUpdate({ _id: req.user.id }, { password: hashPassword }, { new: true }, (err, seller) => {
+                        this.User.findOneAndUpdate({ _id: req.user.id }, { password: hashPassword }, { new: true }, (err, seller) => {
                             if (!seller) {
                                 return res.json({
                                     code: 404,
-                                    message: "Seller not found",
+                                    message: "User not found",
                                 });
                             }
                             res.status(200).json({
                                 status: true,
                                 code: 200,
-                                message: "Seller Password Updated",
+                                message: "User Password Updated",
                                 seller: seller,
                             });
                         });
@@ -294,28 +309,28 @@ export default class UserController {
         }
     }
 
-    updateSellerEmail() {
+    updateUserEmail() {
         return (req, res) => {
             try {
-                this.Seller.findOne({ _id: req.user.id }, (err, seller) => {
+                this.User.findOne({ _id: req.user.id }, (err, seller) => {
                     if (!seller) {
                         return res.json({
                             code: 404,
-                            message: "Seller not found",
+                            message: "User not found",
                         });
                     }
                     if (this.bcrypt.compareSync(req.body.password, seller.password)) {
-                        this.Seller.findOneAndUpdate({ _id: req.user.id }, { email: req.body.email }, { new: true }, (err, seller) => {
+                        this.User.findOneAndUpdate({ _id: req.user.id }, { email: req.body.email }, { new: true }, (err, seller) => {
                             if (!seller) {
                                 return res.json({
                                     code: 404,
-                                    message: "Seller not found",
+                                    message: "User not found",
                                 });
                             }
                             res.status(200).json({
                                 status: true,
                                 code: 200,
-                                message: "Seller Email Updated",
+                                message: "User Email Updated",
                                 seller: seller,
                             });
                         });
@@ -337,28 +352,28 @@ export default class UserController {
         }
     }
 
-    updateSellerPhone() {
+    updateUserPhone() {
         return (req, res) => {
             try {
-                this.Seller.findOne({ _id: req.user.id }, (err, seller) => {
+                this.User.findOne({ _id: req.user.id }, (err, seller) => {
                     if (!seller) {
                         return res.json({
                             code: 404,
-                            message: "Seller not found",
+                            message: "User not found",
                         });
                     }
                     if (this.bcrypt.compareSync(req.body.password, seller.password)) {
-                        this.Seller.findOneAndUpdate({ _id: req.user.id }, { phone: req.body.phone }, { new: true }, (err, seller) => {
+                        this.User.findOneAndUpdate({ _id: req.user.id }, { phone: req.body.phone }, { new: true }, (err, seller) => {
                             if (!seller) {
                                 return res.json({
                                     code: 404,
-                                    message: "Seller not found",
+                                    message: "User not found",
                                 });
                             }
                             res.status(200).json({
                                 status: true,
                                 code: 200,
-                                message: "Seller Phone Updated",
+                                message: "User Phone Updated",
                                 seller: seller,
                             });
                         });
@@ -380,27 +395,27 @@ export default class UserController {
         }
     }
 
-    updateSellerAddress() {
+    updateUserAddress() {
         return (req, res) => {
             try {
-                this.Seller.findOne({ _id: req.user.id }, (err, seller) => {
+                this.User.findOne({ _id: req.user.id }, (err, seller) => {
                     if (!seller) {
                         return res.json({
                             code: 404,
-                            message: "Seller not found",
+                            message: "User not found",
                         });
                     }
-                    this.Seller.findOneAndUpdate({ _id: req.user.id }, { address: req.body.address }, { new: true }, (err, seller) => {
+                    this.User.findOneAndUpdate({ _id: req.user.id }, { address: req.body.address }, { new: true }, (err, seller) => {
                         if (!seller) {
                             return res.json({
                                 code: 404,
-                                message: "Seller not found",
+                                message: "User not found",
                             });
                         }
                         res.status(200).json({
                             status: true,
                             code: 200,
-                            message: "Seller Address Updated",
+                            message: "User Address Updated",
                             seller: seller,
                         });
                     });
@@ -416,27 +431,27 @@ export default class UserController {
         }
     }
 
-    updateSellerProfileImage() {
+    updateUserProfileImage() {
         return (req, res) => {
             try {
-                this.Seller.findOne({ _id: req.user.id }, (err, seller) => {
+                this.User.findOne({ _id: req.user.id }, (err, seller) => {
                     if (!seller) {
                         return res.json({
                             code: 404,
-                            message: "Seller not found",
+                            message: "User not found",
                         });
                     }
-                    this.Seller.findOneAndUpdate({ _id: req.user.id }, { profileImage: req.body.profileImage }, { new: true }, (err, seller) => {
+                    this.User.findOneAndUpdate({ _id: req.user.id }, { profileImage: req.body.profileImage }, { new: true }, (err, seller) => {
                         if (!seller) {
                             return res.json({
                                 code: 404,
-                                message: "Seller not found",
+                                message: "User not found",
                             });
                         }
                         res.status(200).json({
                             status: true,
                             code: 200,
-                            message: "Seller Profile Image Updated",
+                            message: "User Profile Image Updated",
                             seller: seller,
                         });
                     });
@@ -456,12 +471,12 @@ export default class UserController {
     sendVerificationEmail() {
         return (req, res) => {
             const { email } = req.body;
-            this.Seller.findOne({ email: email }, (err, seller) => {
+            this.User.findOne({ email: email }, (err, seller) => {
                 if ( !seller ) {
                     return res.json({
                         status: false,
                         code: 404,
-                        message: "Seller not found",
+                        message: "User not found",
                     });
                 }
                 const subject = "Verify your email";
@@ -490,13 +505,13 @@ export default class UserController {
     }
 
     // VERIFY USER EMAIL
-    verifySellerEmail() {
+    verifyUserEmail() {
         return (req, res) => {
-            this.Seller.findOne({ email: req.body.email }, (err, seller) => {
+            this.User.findOne({ email: req.body.email }, (err, seller) => {
                 if (!seller) {
                     return res.json({
                         code: 404,
-                        message: "Seller not found",
+                        message: "User not found",
                     });
                 }
                 if (seller.verificationCode === req.body.verificationCode) {
@@ -506,7 +521,7 @@ export default class UserController {
                             res.status(200).json({
                                 status: true,
                                 code: 200,
-                                message: "Seller Verified",
+                                message: "User Verified",
                                 seller: doc,
                             });
                         } else {
@@ -529,16 +544,16 @@ export default class UserController {
     };
 
     //  GET ALL USER DATA
-    loadAllSellers = () => {
+    loadAllUsers = () => {
         return (req, res) => {
             try {
-                this.Seller.find({}, (err, data) => {
+                this.User.find({}, (err, data) => {
                     if (!err) {
                         res.status(200).json({
                             status: true,
                             code: 200,
-                            message: "Seller data loaded successfully",
-                            loadAllSellers: data,
+                            message: "User data loaded successfully",
+                            loadAllUsers: data,
                         });
                     } else {
                         console.log(err);
@@ -561,15 +576,15 @@ export default class UserController {
     };
 
     //  GET SINGLE USER DATA
-    getSingleSellerData = () => {
+    getSingleUserData = () => {
         return (req, res) => {
             try {
-                this.Seller.findById(req.params.id, (err, data) => {
+                this.User.findById(req.params.id, (err, data) => {
                     if (!err) {
                         res.status(200).json({
                             status: true,
                             code: 200,
-                            message: "Seller data loaded successfully",
+                            message: "User data loaded successfully",
                             seller: data,
                         });
                     } else {
@@ -577,7 +592,7 @@ export default class UserController {
                         res.status(404).json({
                             status: false,
                             code: 404,
-                            message: "Seller not found",
+                            message: "User not found",
                         });
                     }
                 });
@@ -586,23 +601,23 @@ export default class UserController {
                 res.status(500).json({
                     status: false,
                     code: 500,
-                    message: "Seller not found",
+                    message: "User not found",
                 });
             }
         };
     };
 
     //  EDIT SINGLE USER DATA
-    editSingleSellerData = () => {
+    editSingleUserData = () => {
         return (req, res) => {
             try {
                 console.log(req.body);
-                this.Seller.findByIdAndUpdate(req.params.id, req.body, (err, data) => {
+                this.User.findByIdAndUpdate(req.params.id, req.body, (err, data) => {
                     if (!err) {
                         res.status(200).json({
                             status: true,
                             code: 200,
-                            message: "Seller data updated successfully",
+                            message: "User data updated successfully",
                             seller: data,
                         });
                     } else {
@@ -610,7 +625,7 @@ export default class UserController {
                         res.status(500).json({
                             status: false,
                             code: 500,
-                            message: "Seller data not updated",
+                            message: "User data not updated",
                         });
                     }
                 });
@@ -619,7 +634,7 @@ export default class UserController {
                 res.status(500).json({
                     status: false,
                     code: 500,
-                    message: "Seller data not updated",
+                    message: "User data not updated",
                 });
             }
         };
@@ -629,7 +644,7 @@ export default class UserController {
     resetPassword = () => {
         return (req, res) => {
             try {
-                this.Seller.findByIdAndUpdate(req.body.id, {
+                this.User.findByIdAndUpdate(req.body.id, {
                     password: req.body.password,
                     confirmPassword: req.body.confirmPassword,
                 }, (err, data) => {
@@ -660,25 +675,25 @@ export default class UserController {
         };
     }
 
-    logOutSeller = () => {
+    logOutUser = () => {
         return (req, res) => {
             try {
-                this.Seller.findByIdAndUpdate(req.body.id, {
+                this.User.findByIdAndUpdate(req.body.id, {
                     isActive: false,
                 }, (err, data) => {
                     if (!err) {
                         res.status(200).json({
                             status: true,
                             code: 200,
-                            message: "Seller logged out successfully",
-                            logOutSeller: data,
+                            message: "User logged out successfully",
+                            logOutUser: data,
                         });
                     } else {
                         console.log(err);
                         res.status(500).json({
                             status: false,
                             code: 500,
-                            message: "Seller not logged out",
+                            message: "User not logged out",
                         });
                     }
                 })
@@ -687,7 +702,7 @@ export default class UserController {
                 res.status(500).json({
                     status: false,
                     code: 500,
-                    message: "Seller not logged out",
+                    message: "User not logged out",
                 });
             }
         };
@@ -697,7 +712,7 @@ export default class UserController {
     saveProductInCart = () => {
         return (req, res) => {
             try {
-                this.Seller.findByIdAndUpdate(req.user.id, {
+                this.User.findByIdAndUpdate(req.user.id, {
                     $push: {
                         cart: req.params.productId,
                     },
@@ -733,7 +748,7 @@ export default class UserController {
     removeProductFromCart = () => {
         return (req, res) => {
             try {
-                this.Seller.findByIdAndUpdate(req.user.id, {
+                this.User.findByIdAndUpdate(req.user.id, {
                     $pull: {
                         cart: req.params.productId,
                     },
@@ -769,7 +784,7 @@ export default class UserController {
     getCartData = () => {
         return (req, res) => {
             try {
-                this.Seller.findById(req.user.id, (err, data) => {
+                this.User.findById(req.user.id, (err, data) => {
                     if (!err) {
                         if (data.cart === undefined || data.cart.length === 0) {
                             return res.status(200).json({
