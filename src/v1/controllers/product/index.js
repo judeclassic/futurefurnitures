@@ -64,7 +64,7 @@ class SellerController {
                         status: true,
                         code: 200,
                         message: "SUCCESSFULLY UPLOADED",
-                        data: product,
+                        products: product,
                     });
                 } catch (error) {
                     console.log(error);
@@ -91,7 +91,7 @@ class SellerController {
                     return res.status(200).json({
                         status: true,
                         code: 200,
-                        data: product,
+                        product: product,
                     });
                 } catch (error) {
                     return res.status(500).json({
@@ -124,7 +124,7 @@ class SellerController {
                         status: true,
                         code: 200,
                         message: "Product deleted successfully",
-                        data: product,
+                        product: product,
                     });
                 } catch {
                     return res.status(200).json({
@@ -148,7 +148,7 @@ class SellerController {
                     return res.status(200).json({
                         status: true,
                         code: 200,
-                        data: products,
+                        product: products,
                     });
                 } catch (error) {
                     return res.status(500).json({
@@ -172,7 +172,7 @@ class SellerController {
                     return res.status(200).json({
                         status: true,
                         code: 200,
-                        data: products,
+                        products: products,
                     });
                 } catch (error) {
                     return res.status(500).json({
@@ -196,7 +196,7 @@ class SellerController {
                     return res.status(200).json({
                         status: true,
                         code: 200,
-                        data: products,
+                        products: products,
                     });
                 } catch (error) {
                     return res.status(500).json({
@@ -343,7 +343,7 @@ export default class ProductController extends SellerController {
                         status: true,
                         code: 200,
                         message: "Featured products fetched successfully",
-                        data: products,
+                        products: products,
                     });
                 } catch (error) {
                     return res.status(500).json({
@@ -367,7 +367,7 @@ export default class ProductController extends SellerController {
                         status: true,
                         code: 200,
                         message: "Top rated products fetched successfully",
-                        data: products,
+                        products: products,
                     });
                 }
                 catch (error) {
