@@ -1,9 +1,9 @@
 //@ts-check
 
-const router = ({ Router, UserController, Seller, UserProduct, Authenticate, EmailHandler, bcrypt, jwt, uploader, Product }) => {
+const router = ({ Router, UserController, Seller, SellerProduct, Authenticate, EmailHandler, bcrypt, jwt, uploader, Product }) => {
     const router = Router();
 
-    const userController = new UserController({ User: Seller, EmailHandler, UserProduct, Product, bcrypt, jwt });
+    const userController = new UserController({ User: Seller, EmailHandler, UserProduct: SellerProduct, Product, bcrypt, jwt });
     const { verifyUserToken } = new Authenticate({ User: Seller, bcrypt, jwt });
 
     // User Login

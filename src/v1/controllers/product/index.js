@@ -7,9 +7,8 @@ class SellerController {
         this.messages = messages;
     }
 
-    createProduct = () => {
+    create = () => {
         return (req, res) => {
-            console.log('yeah');
             const run = async () => {
                 const image = req.files.map(file => file.imagePath);
                 try{
@@ -71,6 +70,127 @@ class SellerController {
                     return res.status(500).json({
                         status: false,
                         code: 500,
+                        message: error.message,
+                    });
+                }
+            }
+
+            return run();
+        }
+    }
+
+    createProduct = () => {
+        return (req, res) => {
+            const run = async () => {
+                try{
+                    const {
+                        name,
+                        description,
+                        price,
+                        discount,
+                        color,
+                        size,
+                        dimensions,
+                        weight,
+                        seller,
+                        currectPrice,
+                        quantity,
+                        brand,
+                        category,
+                        subCategory,
+                        featured,
+                        status,
+                        isVerified,
+                        isActive,
+                    } = req.body;
+
+                    const product = new this.Product({
+                        name,
+                        description,
+                        price,
+                        discount,
+                        color,
+                        size,
+                        dimensions,
+                        weight,
+                        seller,
+                        currectPrice,
+                        quantity,
+                        brand,
+                        category,
+                        subCategory,
+                        featured,
+                        createDate: new Date,
+                        updateDate: new Date,
+                        status,
+                        isDeleted: isVerified || false,
+                        isVerified: false,
+                        isActive,
+                    });
+
+                    await product.save();
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "SUCCESSFULLY UPLOADED",
+                        products: product,
+                    });
+                } catch (error) {
+                    console.log(error);
+                    return res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: error.message,
+                    });
+                }
+            }
+
+            return run();
+        }
+    }
+
+    createVariant = () => {
+        return (req, res) => {
+            console.log('yeah');
+            const run = async () => {
+                const image = req.files.map(file => file.imagePath);
+
+                try{
+                    const {
+                        name,
+                        price,
+                        color,
+                        quantity,
+                    } = req.body;
+
+                    const product = await this.Product.findByIdAndUpdate(
+                        req.params.id,
+                        {
+                            $push: {
+                                variants: {
+                                    name,
+                                    quantity,
+                                    color,
+                                    image,
+                                    price,
+                                },
+                                image,
+                            }
+                        },
+                        { new: true });
+
+                    await product.save();
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "VARIANT ADDED SUCCESSFULLY",
+                        products: product,
+                    });
+                } catch (error) {
+                    console.log(error);
+                    return res.status(500).json({
+                        status: false,
+                        code: 403,
                         message: error.message,
                     });
                 }

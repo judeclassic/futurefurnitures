@@ -46,6 +46,10 @@ const Seller= mongoose.model("Seller", mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     ref: "Product",
   }],
+  orderedProducts: [{
+    type: mongoose.Schema.ObjectId,
+    ref: "Product",
+  }],
   boughtProducts: [{
     type: mongoose.Schema.ObjectId,
     ref: "Product",

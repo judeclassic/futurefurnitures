@@ -10,9 +10,9 @@ cloudinary.config({
     secure: true
 });
   
-function MyCustomStorage () {}
+function SingleStorageEngine () {}
 
-MyCustomStorage.prototype._handleFile = function _handleFile (req, file, cb) {
+SingleStorageEngine.prototype._handleFile = function _handleFile (req, file, cb) {
     file.stream.pipe(cloudinary.uploader.upload_stream(function (error, result) {
         if (error) {
             return cb(error);
@@ -23,7 +23,7 @@ MyCustomStorage.prototype._handleFile = function _handleFile (req, file, cb) {
     }));                        
 }
 
-MyCustomStorage.prototype._removeFile = function _removeFile (req, file, cb) {
+SingleStorageEngine.prototype._removeFile = function _removeFile (req, file, cb) {
     console.log(file)
     cloudinary.uploader.destroy(file.filename, function (error, result) {
         if (error) {
@@ -33,13 +33,39 @@ MyCustomStorage.prototype._removeFile = function _removeFile (req, file, cb) {
     });
 }
 
-const storage = new MyCustomStorage();
+
+// FOR NORMAL UPLOAD
+const singleStorage = new SingleStorageEngine();
+
+export const uploader = multer({ storage: singleStorage }).any();
 
 
-const multerUploads = multer({ storage }).any();
 
-export default multerUploads;
+function ProductStorageEngine () {}
 
+ProductStorageEngine.prototype._handleFile = function _handleFile (req, file, cb) {
+    file.stream.pipe(cloudinary.uploader.upload_stream(function (error, result) {
+        if (error) {
+            return cb(error);
+        }
+        cb(null, {
+            imagePath: result.url
+        });
+    }));                        
+}
 
+ProductStorageEngine.prototype._removeFile = function _removeFile (req, file, cb) {
+    console.log(file)
+    cloudinary.uploader.destroy(file.filename, function (error, result) {
+        if (error) {
+            return cb(error);
+        }
+        cb(null, result);
+    });
+}
+
+const productsStorage = new ProductStorageEngine();
+
+export const productUploader = multer({ storage: singleStorage }).any();
 
 

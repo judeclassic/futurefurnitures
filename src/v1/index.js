@@ -33,7 +33,7 @@ import EmailHandler from "./lib/handlers/email-handler";
 import messages from "./lib/constants/messages";
 import PaymentHandler from "./lib/handlers/payment-handler";
 import Logger from "./lib/handlers/log-handler";
-import uploader from "./lib/handlers/uploader";
+import { uploader, productUploader } from "./lib/handlers/uploader";
 
 
 import bcrypt from "bcryptjs";
@@ -58,7 +58,7 @@ export const theHouseInteriorApp = function ({app, server}) {
     
     app.use("/v1/api/email/", subscribeRouter({ Router, SubscriptionController, Subscription, EmailHandler }));
     app.use('/v1/api/user', userRouter({ Router, UserController, Seller, SellerProduct, Product, Authenticate, EmailHandler, bcrypt, jwt, uploader }));
-    app.use('/v1/api/product', productRouter({ Router, ProductController, Authenticate, Product, User, EmailHandler, messages, bcrypt, jwt, uploader }));
+    app.use('/v1/api/product', productRouter({ Router, ProductController, Authenticate, Product, User, EmailHandler, messages, bcrypt, jwt, productUploader }));
     app.use('/v1/api/vendor', vendorRouter({Router, VendorController, Authenticate, Vendor, User, service, EmailHandler, PaymentHandler, bcrypt, jwt, Logger, uploader }));
     app.use('/v1/api/service', vendorRouter({Router, VendorController, Authenticate, Vendor, User, service, EmailHandler, PaymentHandler, bcrypt, jwt, Logger, uploader }));
     
