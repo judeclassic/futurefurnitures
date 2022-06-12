@@ -37,18 +37,18 @@ class ServiceController {
                         services: services.map(service => ({...service._doc, vendor: undefined, user: undefined})),
                     });
                 } else {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Services fetch failed",
                     });
                 }
             }
             run().catch((err) => {
                 this.logger.error(err);
-                return res.status(500).json({
+                return res.status(403).json({
                     status: false,
-                    code: 500,
+                    code: 403,
                     message: "Services fetch failed",
                 });
             });
@@ -74,18 +74,18 @@ class ServiceController {
                         service: {...service._doc, vendor: undefined, user: undefined},
                     });
                 } else {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Service fetch failed",
                     });
                 }
             }
             run().catch((err) => {
                 this.logger.error(err);
-                return res.status(500).json({
+                return res.status(403).json({
                     status: false,
-                    code: 500,
+                    code: 403,
                     message: "Service fetch failed",
                 });
             });
@@ -113,18 +113,18 @@ class ServiceController {
                         service: {...service._doc, vendor: undefined, user: undefined},
                     });
                 } else {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Service update failed",
                     }); 
                 }
             }
             run().catch((err) => {
                 this.logger.error(err);
-                return res.status(500).json({
+                return res.status(403).json({
                     status: false,
-                    code: 500,
+                    code: 403,
                     message: "Service update failed",
                 });
             });
@@ -149,18 +149,18 @@ class ServiceController {
                         message: "Service deleted successfully",
                     });
                 } else {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Service delete failed",
                     });
                 }
             }
             run().catch((err) => {
                 this.logger.error(err);
-                return res.status(500).json({
+                return res.status(403).json({
                     status: false,
-                    code: 500,
+                    code: 403,
                     message: "Service delete failed",
                 });
             });
@@ -179,33 +179,33 @@ class ServiceController {
                 const { id } = req.params;
                 const service = await this.Service.findById(id);
                 if (!service) {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Service not found",
                     });
                 }
                 const user = await this.User.findById(service.user);
                 if (!user) {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "User not found",
                     });
                 }
                 const vendor = await this.Vendor.findById(service.vendor);
                 if (!vendor) {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Vendor not found",
                     });
                 }
                 const payment = await this.paymentHandler.createPayment(service.amount, vendor.email, user.email);
                 if (!payment) {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Payment failed",
                     });
                 }
@@ -216,9 +216,9 @@ class ServiceController {
                     new: true,
                 });
                 if (!updatedService) {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Service update failed",
                     });
                 }
@@ -235,9 +235,9 @@ class ServiceController {
                         service: {...updatedService._doc, vendor: undefined, user: undefined},
                     });
                 } else {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Service approval failed",
                     });
                 }
@@ -257,25 +257,25 @@ class ServiceController {
                 const { id } = req.params;
                 const service = await this.Service.findById(id);
                 if (!service) {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Service not found",
                     });
                 }
                 const user = await this.User.findById(service.user);
                 if (!user) {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "User not found",
                     });
                 }
                 const vendor = await this.Vendor.findById(service.vendor);
                 if (!vendor) {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Vendor not found",
                     });
                 }
@@ -292,9 +292,9 @@ class ServiceController {
                         service: {...service._doc, vendor: undefined, user: undefined},
                     });
                 } else {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Service rejection failed",
                     });
                 }
@@ -314,25 +314,25 @@ class ServiceController {
                 const { id } = req.params;
                 const service = await this.Service.findById(id);
                 if (!service) {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Service not found",
                     });
                 }
                 const user = await this.User.findById(service.user);
                 if (!user) {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "User not found",
                     });
                 }
                 const vendor = await this.Vendor.findById(service.vendor);
                 if (!vendor) {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Vendor not found",
                     });
                 }
@@ -349,9 +349,9 @@ class ServiceController {
                         service: {...service._doc, vendor: undefined, user: undefined},
                     });
                 } else {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Service cancellation failed",
                     });
                 }
@@ -390,9 +390,9 @@ export default class VendorController extends ServiceController {
                 const vendorWithEmail = await this.vendor.findOne({ email });
 
                 if (vendorWithEmail) {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Vendor with email already exists",
                     });
                 }
@@ -400,9 +400,9 @@ export default class VendorController extends ServiceController {
                 const vendorWithPhone = await this.vendor.findOne({ phone });
 
                 if (vendorWithPhone) {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Vendor with phone already exists",
                     });
                 }
@@ -423,18 +423,18 @@ export default class VendorController extends ServiceController {
                         vendor: {...vendor._doc, password: undefined},
                     });
                 } else {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Vendor registration failed",
                     });
                 }
             }
             run().catch((err) => {
                 this.logger.error(err);
-                return res.status(500).json({
+                return res.status(403).json({
                     status: false,
-                    code: 500,
+                    code: 403,
                     message: "Vendor registration failed",
                 });
             }
@@ -482,9 +482,9 @@ export default class VendorController extends ServiceController {
             }
             run().catch((err) => {
                 this.logger.error(err);
-                return res.status(500).json({
+                return res.status(403).json({
                     status: false,
-                    code: 500,
+                    code: 403,
                     message: "Vendor login failed",
                 });
             }
@@ -509,9 +509,9 @@ export default class VendorController extends ServiceController {
 
                     const vendor = await this.vendor.findById(id);
                     if (!vendor) {
-                        return res.status(500).json({
+                        return res.status(403).json({
                             status: false,
-                            code: 500,
+                            code: 403,
                             message: "Vendor not found",
                         });
                     }
@@ -532,17 +532,17 @@ export default class VendorController extends ServiceController {
                             vendor: {...updatedVendor._doc, password: undefined},
                         });
                     } else {
-                        return res.status(500).json({
+                        return res.status(403).json({
                             status: false,
-                            code: 500,
+                            code: 403,
                             message: "Vendor info update failed",
                         });
                     }
                 } catch (err) {
                     this.logger.error(err);
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Vendor info update failed",
                     });
                 }
@@ -550,9 +550,9 @@ export default class VendorController extends ServiceController {
 
             run().catch((err) => {
                 this.logger.error(err);
-                return res.status(500).json({
+                return res.status(403).json({
                     status: false,
-                    code: 500,
+                    code: 403,
                     message: "Vendor info update failed",
                 });
             });
@@ -563,22 +563,21 @@ export default class VendorController extends ServiceController {
         return (req, res) => {
             const run = async () => {
                 const { id } = req.body;
-                var image = req.files && req.files.map(file => file.imagePath);
-                const license = req.body.isLicense && image[image.length - 1];
-                if (req.body.isLicense) {
-                    image.pop();
-                }
+                var image = req.files && req.files.crew_image ? req.files.crew_image.map(file => file.imagePath) : [];
+                var license = req.files && req.files.license ? req.files.license.map(file => file.lisencePath) : [];
+                console.log(license)
+
                 const vendor = await this.vendor.findById(id);
                 if (!vendor) {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Vendor not found",
                     });
                 }
                 const updatedVendor = await this.vendor.findByIdAndUpdate(id, {
                     image: [...vendor.image, ...image],
-                    license,
+                    license: [...vendor.license, ...license],
                 });
                 if (updatedVendor) {
                     return res.status(200).json({
@@ -588,9 +587,9 @@ export default class VendorController extends ServiceController {
                         vendor: {...updatedVendor._doc, password: undefined},
                     });
                 } else {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Vendor info update failed",
                     });
                 }
@@ -598,9 +597,9 @@ export default class VendorController extends ServiceController {
 
             run().catch((err) => {
                 this.logger.error(err);
-                return res.status(500).json({
+                return res.status(403).json({
                     status: false,
-                    code: 500,
+                    code: 403,
                     message: "Vendor info update failed",
                 });
             });
@@ -618,9 +617,9 @@ export default class VendorController extends ServiceController {
 
                 const vendor = await this.vendor.findById(id);
                 if (!vendor) {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Vendor not found",
                     });
                 }
@@ -636,9 +635,9 @@ export default class VendorController extends ServiceController {
                         vendor: {...updatedVendor._doc, password: undefined},
                     });
                 } else {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Vendor info update failed",
                     });
                 }
@@ -646,9 +645,9 @@ export default class VendorController extends ServiceController {
 
             run().catch((err) => {
                 this.logger.error(err);
-                return res.status(500).json({
+                return res.status(403).json({
                     status: false,
-                    code: 500,
+                    code: 403,
                     message: "Vendor info update failed",
                 });
             });
@@ -661,9 +660,9 @@ export default class VendorController extends ServiceController {
                 const { vendorId } = req.params;
                 const vendor = await this.vendor.findById(vendorId);
                 if (!vendor) {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Vendor not found",
                     });
                 }
@@ -678,9 +677,9 @@ export default class VendorController extends ServiceController {
                         expectedFunds,
                     });
                 } else {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Expected funds fetch failed or is Empty",
                     });
                 }
@@ -688,9 +687,9 @@ export default class VendorController extends ServiceController {
 
             run().catch((err) => {
                 this.logger.error(err);
-                return res.status(500).json({
+                return res.status(403).json({
                     status: false,
-                    code: 500,
+                    code: 403,
                     message: "Expected funds fetch failed",
                 });
             });
@@ -703,9 +702,9 @@ export default class VendorController extends ServiceController {
                 const { vendorId } = req.params;
                 const vendor = await this.vendor.findById(vendorId);
                 if (!vendor) {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Vendor not found",
                     });
                 }
@@ -721,9 +720,9 @@ export default class VendorController extends ServiceController {
                         pendingFunds,
                     });
                 } else {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Pending funds fetch failed or is Empty",
                     });
                 }
@@ -731,9 +730,9 @@ export default class VendorController extends ServiceController {
 
             run().catch((err) => {
                 this.logger.error(err);
-                return res.status(500).json({
+                return res.status(403).json({
                     status: false,
-                    code: 500,
+                    code: 403,
                     message: "Pending funds fetch failed",
                 });
             });
@@ -746,9 +745,9 @@ export default class VendorController extends ServiceController {
                 const { vendorId } = req.params;
                 const vendor = await this.vendor.findById(vendorId);
                 if (!vendor) {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Vendor not found",
                     });
                 }
@@ -764,9 +763,9 @@ export default class VendorController extends ServiceController {
                         availableFunds,
                     });
                 } else {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Available funds fetch failed or is Empty",
                     });
                 }
@@ -774,9 +773,9 @@ export default class VendorController extends ServiceController {
 
             run().catch((err) => {
                 this.logger.error(err);
-                return res.status(500).json({
+                return res.status(403).json({
                     status: false,
-                    code: 500,
+                    code: 403,
                     message: "Available funds fetch failed",
                 });
             });
@@ -789,9 +788,9 @@ export default class VendorController extends ServiceController {
                 const { vendorId } = req.user;
                 const vendor = await this.vendor.findById(vendorId);
                 if (!vendor) {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Vendor not found",
                     });
                 }
@@ -807,9 +806,9 @@ export default class VendorController extends ServiceController {
                         withdrawFunds,
                     });
                 } else {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Withdraw funds fetch failed or is Empty",
                     });
                 }
@@ -817,9 +816,9 @@ export default class VendorController extends ServiceController {
 
             run().catch((err) => {
                 this.logger.error(err);
-                return res.status(500).json({
+                return res.status(403).json({
                     status: false,
-                    code: 500,
+                    code: 403,
                     message: "Withdraw funds fetch failed",
                 });
             });
@@ -837,17 +836,17 @@ export default class VendorController extends ServiceController {
 
                 const vendor = await this.vendor.findById(id);
                 if (!vendor) {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Vendor not found",
                     });
                 }
                 const isValid = await this.bcrypt.compare(oldPassword, vendor.password);
                 if (!isValid) {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Old password is incorrect",
                     });
                 }
@@ -863,9 +862,9 @@ export default class VendorController extends ServiceController {
                         vendor: {...updatedVendor._doc, password: undefined},
                     });
                 } else {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Vendor password update failed",
                     });
                 }
@@ -873,9 +872,9 @@ export default class VendorController extends ServiceController {
 
             run().catch((err) => {
                 this.logger.error(err);
-                return res.status(500).json({
+                return res.status(403).json({
                     status: false,
-                    code: 500,
+                    code: 403,
                     message: "Vendor password update failed",
                 });
             });
@@ -893,17 +892,17 @@ export default class VendorController extends ServiceController {
 
                 const vendor = await this.vendor.findById(id);
                 if (!vendor) {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Vendor not found",
                     });
                 }
                 const isValid = await this.bcrypt.compare(password, vendor.password);
                 if (!isValid) {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Password is incorrect",
                     });
                 }
@@ -918,9 +917,9 @@ export default class VendorController extends ServiceController {
                         vendor: {...updatedVendor._doc, password: undefined},
                     });
                 } else {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Vendor email update failed",
                     });
                 }
@@ -928,9 +927,9 @@ export default class VendorController extends ServiceController {
 
             run().catch((err) => {
                 this.logger.error(err);
-                return res.status(500).json({
+                return res.status(403).json({
                     status: false,
-                    code: 500,
+                    code: 403,
                     message: "Vendor email update failed",
                 });
             });
@@ -942,28 +941,28 @@ export default class VendorController extends ServiceController {
             const run = async () => {
                 const { id } = req.user;
                 const {
-                    email,
+                    phone,
                     password,
                 } = req.body;
 
                 const vendor = await this.vendor.findById(id);
                 if (!vendor) {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Vendor not found",
                     });
                 }
                 const isValid = await this.bcrypt.compare(password, vendor.password);
                 if (!isValid) {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Password is incorrect",
                     });
                 }
                 const updatedVendor = await this.vendor.findByIdAndUpdate(id, {
-                    email,
+                    phone,
                 });
                 if (updatedVendor) {
                     return res.status(200).json({
@@ -973,9 +972,9 @@ export default class VendorController extends ServiceController {
                         vendor: {...updatedVendor._doc, password: undefined},
                     });
                 } else {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Vendor phone number update failed",
                     });
                 }
@@ -983,9 +982,9 @@ export default class VendorController extends ServiceController {
 
             run().catch((err) => {
                 this.logger.error(err);
-                return res.status(500).json({
+                return res.status(403).json({
                     status: false,
-                    code: 500,
+                    code: 403,
                     message: "Vendor phone number update failed",
                 });
             });
@@ -1002,9 +1001,9 @@ export default class VendorController extends ServiceController {
 
                 const vendor = await this.vendor.findById(id);
                 if (!vendor) {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Vendor not found",
                     });
                 }
@@ -1019,9 +1018,9 @@ export default class VendorController extends ServiceController {
                         vendor: {...updatedVendor._doc, password: undefined},
                     });
                 } else {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Vendor country update failed",
                     });
                 }
@@ -1029,9 +1028,9 @@ export default class VendorController extends ServiceController {
 
             run().catch((err) => {
                 this.logger.error(err);
-                return res.status(500).json({
+                return res.status(403).json({
                     status: false,
-                    code: 500,
+                    code: 403,
                     message: "Vendor country update failed",
                 });
             });
@@ -1048,9 +1047,9 @@ export default class VendorController extends ServiceController {
 
                 const vendor = await this.vendor.findById(id);
                 if (!vendor) {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Vendor not found",
                     });
                 }
@@ -1065,9 +1064,9 @@ export default class VendorController extends ServiceController {
                         vendor: {...updatedVendor._doc, password: undefined},
                     });
                 } else {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Vendor state update failed",
                     });
                 }
@@ -1075,9 +1074,9 @@ export default class VendorController extends ServiceController {
 
             run().catch((err) => {
                 this.logger.error(err);
-                return res.status(500).json({
+                return res.status(403).json({
                     status: false,
-                    code: 500,
+                    code: 403,
                     message: "Vendor state update failed",
                 });
             });
@@ -1094,17 +1093,17 @@ export default class VendorController extends ServiceController {
                 
                 const vendor = await this.vendor.findById(id);
                 if (!vendor) {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Vendor not found",
                     });
                 }
                 const isValid = await this.bcrypt.compare(password, vendor.password);
                 if (!isValid) {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Password is incorrect",
                     });
                 }
@@ -1118,9 +1117,9 @@ export default class VendorController extends ServiceController {
                         message: "Vendor account deactivated successfully",
                     });
                 } else {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Vendor account deactivation failed",
                     });
                 }
@@ -1128,9 +1127,9 @@ export default class VendorController extends ServiceController {
 
             run().catch((err) => {
                 this.logger.error(err);
-                return res.status(500).json({
+                return res.status(403).json({
                     status: false,
-                    code: 500,
+                    code: 403,
                     message: "Vendor account deactivation failed",
                 });
             });
@@ -1170,18 +1169,18 @@ export default class VendorController extends ServiceController {
                         vendors: vendors.map(vendor => ({...vendor._doc, password: undefined})),
                     });
                 } else {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Vendors fetch failed",
                     });
                 }
             }
             run().catch((err) => {
                 this.logger.error(err);
-                return res.status(500).json({
+                return res.status(403).json({
                     status: false,
-                    code: 500,
+                    code: 403,
                     message: "Vendors fetch failed",
                 });
             }
@@ -1208,9 +1207,9 @@ export default class VendorController extends ServiceController {
                         vendor: {...vendor._doc, password: undefined},
                     });
                 } else {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Vendor fetch failed",
                     });
                 }
@@ -1218,9 +1217,9 @@ export default class VendorController extends ServiceController {
 
             run().catch((err) => {
                 this.logger.error(err);
-                return res.status(500).json({
+                return res.status(403).json({
                     status: false,
-                    code: 500,
+                    code: 403,
                     message: "Vendor fetch failed",
                 });
             });
@@ -1248,18 +1247,18 @@ export default class VendorController extends ServiceController {
                         vendor: {...vendor._doc, password: undefined},
                     });
                 } else {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Vendor update failed",
                     });
                 }
             }
             run().catch((err) => {
                 this.logger.error(err);
-                return res.status(500).json({
+                return res.status(403).json({
                     status: false,
-                    code: 500,
+                    code: 403,
                     message: "Vendor update failed",
                 });
             });
@@ -1285,18 +1284,18 @@ export default class VendorController extends ServiceController {
                         vendor: {...vendor._doc, password: undefined},
                     });
                 } else {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Vendor delete failed",
                     });
                 }
             }
             run().catch((err) => {
                 this.logger.error(err);
-                return res.status(500).json({
+                return res.status(403).json({
                     status: false,
-                    code: 500,
+                    code: 403,
                     message: "Vendor delete failed",
                 });
             });
@@ -1325,9 +1324,9 @@ export default class VendorController extends ServiceController {
                 const payment = await this.paymentHandler.payForService(vendor._doc, req.body);
 
                 if (!payment && !payment.isSuccess) {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Payment failed",
                     });
                 }
@@ -1346,18 +1345,18 @@ export default class VendorController extends ServiceController {
                         vendor: {...updatedVendor._doc, password: undefined},
                     });
                 } else {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Vendor payment failed",
                     });
                 }
             }
             run().catch((err) => {
                 this.logger.error(err);
-                return res.status(500).json({
+                return res.status(403).json({
                     status: false,
-                    code: 500,
+                    code: 403,
                     message: "Vendor payment failed",
                 });
             });
@@ -1397,9 +1396,9 @@ export default class VendorController extends ServiceController {
                             service,
                         });
                     } else {
-                        return res.status(500).json({
+                        return res.status(403).json({
                             status: false,
-                            code: 500,
+                            code: 403,
                             message: "Service sent failed",
                         });
                     }
@@ -1407,9 +1406,9 @@ export default class VendorController extends ServiceController {
             }
             run().catch((err) => {
                 this.logger.error(err);
-                return res.status(500).json({
+                return res.status(403).json({
                     status: false,
-                    code: 500,
+                    code: 403,
                     message: "Service sent failed",
                 });
             });
@@ -1443,9 +1442,9 @@ export default class VendorController extends ServiceController {
                             services: services.map(service => ({...service._doc, vendor: undefined, user: undefined})),
                         });
                     } else {
-                        return res.status(500).json({
+                        return res.status(403).json({
                             status: false,
-                            code: 500,
+                            code: 403,
                             message: "Services fetch failed",
                         });
                     }
@@ -1453,9 +1452,9 @@ export default class VendorController extends ServiceController {
             }
             run().catch((err) => {
                 this.logger.error(err);
-                return res.status(500).json({
+                return res.status(403).json({
                     status: false,
-                    code: 500,
+                    code: 403,
                     message: "Services fetch failed",
                 });
             });
@@ -1481,9 +1480,9 @@ export default class VendorController extends ServiceController {
                         requests: requests
                     });
                 } else {
-                    return res.status(500).json({
+                    return res.status(403).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: "Requests fetch failed",
                     });
                 }
@@ -1491,9 +1490,9 @@ export default class VendorController extends ServiceController {
 
             run().catch((err) => {
                 this.logger.error(err);
-                return res.status(500).json({
+                return res.status(403).json({
                     status: false,
-                    code: 500,
+                    code: 403,
                     message: "Requests fetch failed",
                 });
             });
@@ -1554,9 +1553,9 @@ export default class VendorController extends ServiceController {
                             vendor: {...updatedVendor._doc, password: undefined},
                         });
                     } else {
-                        return res.status(500).json({
+                        return res.status(403).json({
                             status: false,
-                            code: 500,
+                            code: 403,
                             message: "Funds withdrawal failed",
                         });
                     }
@@ -1564,9 +1563,9 @@ export default class VendorController extends ServiceController {
             }
             run().catch((err) => {
                 this.logger.error(err);
-                return res.status(500).json({
+                return res.status(403).json({
                     status: false,
-                    code: 500,
+                    code: 403,
                     message: "Funds withdrawal failed",
                 });
             });

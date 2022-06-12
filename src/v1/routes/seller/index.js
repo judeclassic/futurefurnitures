@@ -1,6 +1,6 @@
 //@ts-check
 
-const router = ({ Router, SellerController, Seller, SellerProduct, Authenticate, EmailHandler, bcrypt, jwt, uploader}) => {
+const router = ({ Router, SellerController, Seller, SellerProduct, Authenticate, EmailHandler, bcrypt, jwt, productUploader, userUploader}) => {
     const router = Router();
 
     const sellerController = new SellerController({ Seller, EmailHandler, SellerProduct, bcrypt, jwt, });
@@ -64,7 +64,7 @@ const router = ({ Router, SellerController, Seller, SellerProduct, Authenticate,
     router.put(
         "/profile/image",
         verifySellerToken(),
-        uploader,
+        userUploader,
         sellerController.updateSellerImage()
     );
 
@@ -105,7 +105,7 @@ const router = ({ Router, SellerController, Seller, SellerProduct, Authenticate,
     router.post(
         "/product",
         verifySellerToken(),
-        uploader,
+        productUploader,
         sellerController.createProduct()
     );
 
@@ -125,7 +125,7 @@ const router = ({ Router, SellerController, Seller, SellerProduct, Authenticate,
     router.put(
         "/product/:id",
         verifySellerToken(),
-        uploader,
+        productUploader,
         sellerController.updateSellerProduct()
     );
 
@@ -133,7 +133,7 @@ const router = ({ Router, SellerController, Seller, SellerProduct, Authenticate,
     router.put(
         "/product/image/:id",
         verifySellerToken(),
-        uploader,
+        productUploader,
         sellerController.updateSellerProductImage()
     );
 

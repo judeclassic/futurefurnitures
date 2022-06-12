@@ -151,7 +151,6 @@ class SellerController {
 
     createVariant = () => {
         return (req, res) => {
-            console.log('yeah');
             const run = async () => {
                 const image = req.files.map(file => file.imagePath);
 
@@ -179,11 +178,65 @@ class SellerController {
                         },
                         { new: true });
 
-                    await product.save();
+                   if (!product) {
+                        return res.status(200).json({
+                            status: false,
+                            code: 403,
+                            message: "PRODUCT NOT FOUND",
+                        });
+                   }
                     return res.status(200).json({
                         status: true,
                         code: 200,
                         message: "VARIANT ADDED SUCCESSFULLY",
+                        products: product,
+                    });
+                } catch (error) {
+                    console.log(error);
+                    return res.status(500).json({
+                        status: false,
+                        code: 403,
+                        message: error.message,
+                    });
+                }
+            }
+
+            return run();
+        }
+    }
+
+    updateVariant = () => {
+        return (req, res) => {
+            const run = async () => {
+                const image = req.files.map(file => file.imagePath);
+                
+                try{
+                    const {
+                        variantId,
+                    } = req.body;
+
+                    const product = await this.Product.findById(req.params.id);
+
+                    if (!product) {
+                        return res.status(200).json({
+                            status: false,
+                            code: 403,
+                            message: "PRODUCT NOT FOUND",
+                        });
+                    }
+                    product.variants = product.variants.map((variant) => {
+                        if (variant.id === variantId) {
+                            variant = {...variant, ...req.body}
+                        }
+                        return variant;
+                    });
+
+                    await product.save();
+
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "VARIANT UPDATED SUCCESSFULLY",
                         products: product,
                     });
                 } catch (error) {

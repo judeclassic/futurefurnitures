@@ -52,9 +52,9 @@ const Vendor = mongoose.model("vendor", {
     years_of_experience: {
         type: String,
     },
-    license_source: {
+    license: [{
         type: String,
-    },
+    }],
     requests: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "request",

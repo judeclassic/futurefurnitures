@@ -1,9 +1,9 @@
 //@ts-check
 
-const router = ({ Router, VendorController, Authenticate, Vendor, User, service, EmailHandler, PaymentHandler, bcrypt, jwt, Logger, uploader }) => {
+const router = ({ Router, VendorController, Authenticate, Vendor, User, service, EmailHandler, PaymentHandler, bcrypt, jwt, Logger, userWithLisenceUploader }) => {
     const router = Router();
 
-    const vendorController = new VendorController({ Vendor, User, service, EmailHandler, PaymentHandler, bcrypt, jwt, Logger, uploader });
+    const vendorController = new VendorController({ EmailHandler, PaymentHandler, User, service, Vendor, Logger, bcrypt, jwt });
     const { verifyUserToken } = new Authenticate({ User, bcrypt, jwt });
 
     router.post('/signUp', vendorController.signUpVendor());
@@ -12,7 +12,7 @@ const router = ({ Router, VendorController, Authenticate, Vendor, User, service,
     
     router.post('/updateJobInfo', verifyUserToken(), vendorController.updateJobInfo());
 
-    router.post('/updatePhotoAndLicense', verifyUserToken(), uploader, vendorController.updatePhotoAndLicense());
+    router.post('/updatePhotoAndLicense', verifyUserToken(), userWithLisenceUploader, vendorController.updatePhotoAndLicense());
 
     router.post('/review', verifyUserToken(), vendorController.reviewVendor());
 

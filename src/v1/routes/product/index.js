@@ -17,6 +17,9 @@ const router = ({ ProductController, Router, Authenticate, Product, User, EmailH
     // Create Variant
     productRouter.post('/createVariant/:id', verifySellerToken(), productUploader, productController.createVariant());
 
+    // Create Variant
+    productRouter.post('/updateVariant/:id', verifySellerToken(), productUploader, productController.updateVariant());
+
     // Update Product
     productRouter.put('/update/:id', verifySellerToken(), productController.updateProduct());
 

@@ -30,8 +30,8 @@ export default class UserController {
 
                 this.User.findOne({
                     email: req.body.email,
-                }, (err, seller) => {
-                    if (seller) {
+                }, (err, user) => {
+                    if (user) {
                         return res.json({
                             success: false,
                             code: 400,
@@ -40,15 +40,15 @@ export default class UserController {
                     } else {
                         this.User.findOne({
                             phone: req.body.phone,
-                            }, (err, seller) => {
-                                if (seller) {
+                            }, (err, user) => {
+                                if (user) {
                                     return res.json({
                                         success: false,
                                         code: 400,
                                         message: "Phone number already exists",
                                     });
                                 } else {
-                                    let seller = new this.User({
+                                    let user = new this.User({
                                         name: req.body.name,
                                         email: req.body.email,
                                         password: hashPassword,
@@ -67,13 +67,13 @@ export default class UserController {
                                         cancelledProducts: [],
                                         deliveredProducts: [],
                                     });
-                                    seller.save((err, doc) => {
+                                    user.save((err, doc) => {
                                         if (!err) {
                                             res.status(200).json({
                                                 status: true,
                                                 code: 200,
                                                 message: "User Registered",
-                                                seller: {...doc._doc, password: null, verificationCode: null},
+                                                user: {...doc._doc, password: null, verificationCode: null},
                                             });
                                             this.EmailHandler.sendVerificationEmail(doc.email, doc.verificationCode);
                                         } else {
@@ -109,29 +109,29 @@ export default class UserController {
                 });
             }
             try {
-                this.User.findOne({ email: req.body.email }, (err, seller) => {
-                    if (!seller) {
+                this.User.findOne({ email: req.body.email }, (err, user) => {
+                    if (!user) {
                         return res.json({
                             code: 404,
                             message: "User not found",
                         });
                     }
-                    if (this.bcrypt.compareSync(req.body.password, seller.password)) {
+                    if (this.bcrypt.compareSync(req.body.password, user.password)) {
                         const payload = {
-                            id: seller._id,
-                            firstName: seller.firstName,
-                            lastName: seller.lastName,
-                            email: seller.email,
-                            isVerified: seller.isVerified,
-                            isAdmin: seller.isAdmin,
-                            isActive: seller.isActive,
-                            isDeleted: seller.isDeleted,
-                            createDate: seller.createDate,
-                            updateDate: seller.updateDate,
-                            role: seller.role,
-                            status: seller.status,
-                            address: seller.address,
-                            phone: seller.phone,
+                            id: user._id,
+                            firstName: user.firstName,
+                            lastName: user.lastName,
+                            email: user.email,
+                            isVerified: user.isVerified,
+                            isAdmin: user.isAdmin,
+                            isActive: user.isActive,
+                            isDeleted: user.isDeleted,
+                            createDate: user.createDate,
+                            updateDate: user.updateDate,
+                            role: user.role,
+                            status: user.status,
+                            address: user.address,
+                            phone: user.phone,
                         };
                         let token = this.jwt.sign(payload, `${USER_ACCESS_TOKEN_SECRET}`, {
                             // expiresIn: 1000 * 60 * 60 * 24 * 7,
@@ -140,8 +140,8 @@ export default class UserController {
                             status: true,
                             code: 200,
                             message: "User Logged In",
-                            seller: {
-                                ...seller._doc,
+                            user: {
+                                ...user._doc,
                                 token,
                             },
                         });
@@ -172,8 +172,8 @@ export default class UserController {
                         message: 'Content can not be empty!'
                     });
                 }
-                this.User.findOne({ _id: req.params.id }, (err, seller) => {
-                    if (!seller) {
+                this.User.findOne({ _id: req.params.id }, (err, user) => {
+                    if (!user) {
                         return res.json({
                             code: 404,
                             message: "User not found",
@@ -183,7 +183,7 @@ export default class UserController {
                         status: true,
                         code: 200,
                         message: "User Profile",
-                        seller: seller,
+                        user: user,
                     });
                 });
             } catch (err) {
@@ -200,21 +200,21 @@ export default class UserController {
     updateUserImage() {
         return (req, res) => {
             try {
-                this.User.findOne({ _id: req.user.id }, (err, seller) => {
-                    if (!seller) {
+                this.User.findOne({ _id: req.user.id }, (err, user) => {
+                    if (!user) {
                         return res.json({
                             code: 404,
                             message: "User not found",
                         });
                     }
-                    seller.profilePic = req.files[0].imagePath;
-                    seller.save((err, doc) => {
+                    user.profilePic = req.files[0].imagePath;
+                    user.save((err, doc) => {
                         if (!err) {
                             res.status(200).json({
                                 status: true,
                                 code: 200,
                                 message: "User Image Updated",
-                                seller: doc,
+                                user: doc,
                             });
                         } else {
                             console.log(err);
@@ -240,8 +240,8 @@ export default class UserController {
     updateUserProfile() {
         return (req, res) => {
             try {
-                this.User.findOneAndUpdate({ _id: req.user.id }, req.body, { new: true }, (err, seller) => {
-                    if (!seller) {
+                this.User.findOneAndUpdate({ _id: req.user.id }, req.body, { new: true }, (err, user) => {
+                    if (!user) {
                         return res.json({
                             code: 404,
                             message: "User not found",
@@ -251,7 +251,7 @@ export default class UserController {
                         status: true,
                         code: 200,
                         message: "User Profile Updated",
-                        seller: seller,
+                        user: user,
                     });
                 });
             } catch (err) {
@@ -268,17 +268,25 @@ export default class UserController {
     updateUserPassword() {
         return (req, res) => {
             try {
-                this.User.findOne({ _id: req.user.id }, (err, seller) => {
-                    if (!seller) {
+                this.User.findOne({ _id: req.user.id }, (err, user) => {
+                    if (!user) {
                         return res.json({
                             code: 404,
                             message: "User not found",
                         });
                     }
-                    if (this.bcrypt.compareSync(req.body.oldPassword, seller.password)) {
+                    console.log(req.body.oldPassword, user.password)
+
+                    if (!req.body.oldPassword && !user.password) {
+                        return res.json({
+                            code: 404,
+                            message: "Passwords missing",
+                        });
+                    }
+                    if (this.bcrypt.compareSync(req.body.oldPassword, user.password)) {
                         let hashPassword = this.bcrypt.hashSync(req.body.newPassword, 10);
-                        this.User.findOneAndUpdate({ _id: req.user.id }, { password: hashPassword }, { new: true }, (err, seller) => {
-                            if (!seller) {
+                        this.User.findOneAndUpdate({ _id: req.user.id }, { password: hashPassword }, { new: true }, (err, user) => {
+                            if (!user) {
                                 return res.json({
                                     code: 404,
                                     message: "User not found",
@@ -288,7 +296,7 @@ export default class UserController {
                                 status: true,
                                 code: 200,
                                 message: "User Password Updated",
-                                seller: seller,
+                                user: user,
                             });
                         });
                     } else {
@@ -312,16 +320,16 @@ export default class UserController {
     updateUserEmail() {
         return (req, res) => {
             try {
-                this.User.findOne({ _id: req.user.id }, (err, seller) => {
-                    if (!seller) {
+                this.User.findOne({ _id: req.user.id }, (err, user) => {
+                    if (!user) {
                         return res.json({
                             code: 404,
                             message: "User not found",
                         });
                     }
-                    if (this.bcrypt.compareSync(req.body.password, seller.password)) {
-                        this.User.findOneAndUpdate({ _id: req.user.id }, { email: req.body.email }, { new: true }, (err, seller) => {
-                            if (!seller) {
+                    if (this.bcrypt.compareSync(req.body.password, user.password)) {
+                        this.User.findOneAndUpdate({ _id: req.user.id }, { email: req.body.email }, { new: true }, (err, user) => {
+                            if (!user) {
                                 return res.json({
                                     code: 404,
                                     message: "User not found",
@@ -331,7 +339,7 @@ export default class UserController {
                                 status: true,
                                 code: 200,
                                 message: "User Email Updated",
-                                seller: seller,
+                                user: user,
                             });
                         });
                     } else {
@@ -355,16 +363,16 @@ export default class UserController {
     updateUserPhone() {
         return (req, res) => {
             try {
-                this.User.findOne({ _id: req.user.id }, (err, seller) => {
-                    if (!seller) {
+                this.User.findOne({ _id: req.user.id }, (err, user) => {
+                    if (!user) {
                         return res.json({
                             code: 404,
                             message: "User not found",
                         });
                     }
-                    if (this.bcrypt.compareSync(req.body.password, seller.password)) {
-                        this.User.findOneAndUpdate({ _id: req.user.id }, { phone: req.body.phone }, { new: true }, (err, seller) => {
-                            if (!seller) {
+                    if (this.bcrypt.compareSync(req.body.password, user.password)) {
+                        this.User.findOneAndUpdate({ _id: req.user.id }, { phone: req.body.phone }, { new: true }, (err, user) => {
+                            if (!user) {
                                 return res.json({
                                     code: 404,
                                     message: "User not found",
@@ -374,7 +382,7 @@ export default class UserController {
                                 status: true,
                                 code: 200,
                                 message: "User Phone Updated",
-                                seller: seller,
+                                user: user,
                             });
                         });
                     } else {
@@ -398,15 +406,15 @@ export default class UserController {
     updateUserAddress() {
         return (req, res) => {
             try {
-                this.User.findOne({ _id: req.user.id }, (err, seller) => {
-                    if (!seller) {
+                this.User.findOne({ _id: req.user.id }, (err, user) => {
+                    if (!user) {
                         return res.json({
                             code: 404,
                             message: "User not found",
                         });
                     }
-                    this.User.findOneAndUpdate({ _id: req.user.id }, { address: req.body.address }, { new: true }, (err, seller) => {
-                        if (!seller) {
+                    this.User.findOneAndUpdate({ _id: req.user.id }, { address: req.body.address }, { new: true }, (err, user) => {
+                        if (!user) {
                             return res.json({
                                 code: 404,
                                 message: "User not found",
@@ -416,7 +424,7 @@ export default class UserController {
                             status: true,
                             code: 200,
                             message: "User Address Updated",
-                            seller: seller,
+                            user: user,
                         });
                     });
                 });
@@ -434,15 +442,15 @@ export default class UserController {
     updateUserProfileImage() {
         return (req, res) => {
             try {
-                this.User.findOne({ _id: req.user.id }, (err, seller) => {
-                    if (!seller) {
+                this.User.findOne({ _id: req.user.id }, (err, user) => {
+                    if (!user) {
                         return res.json({
                             code: 404,
                             message: "User not found",
                         });
                     }
-                    this.User.findOneAndUpdate({ _id: req.user.id }, { profileImage: req.body.profileImage }, { new: true }, (err, seller) => {
-                        if (!seller) {
+                    this.User.findOneAndUpdate({ _id: req.user.id }, { profileImage: req.body.profileImage }, { new: true }, (err, user) => {
+                        if (!user) {
                             return res.json({
                                 code: 404,
                                 message: "User not found",
@@ -452,7 +460,7 @@ export default class UserController {
                             status: true,
                             code: 200,
                             message: "User Profile Image Updated",
-                            seller: seller,
+                            user: user,
                         });
                     });
                 });
@@ -471,8 +479,8 @@ export default class UserController {
     sendVerificationEmail() {
         return (req, res) => {
             const { email } = req.body;
-            this.User.findOne({ email: email }, (err, seller) => {
-                if ( !seller ) {
+            this.User.findOne({ email: email }, (err, user) => {
+                if ( !user ) {
                     return res.json({
                         status: false,
                         code: 404,
@@ -482,14 +490,14 @@ export default class UserController {
                 const subject = "Verify your email";
                 const code = this.generateVerificationCode();
                 this.EmailHandler.sendVerificationEmail({ email, subject, code });
-                seller.verificationCode = code;
-                seller.save((err, doc) => {
+                user.verificationCode = code;
+                user.save((err, doc) => {
                     if (!err) {
                         res.status(200).json({
                             status: true,
                             code: 200,
                             message: "Verification code sent",
-                            seller: doc,
+                            user: doc,
                         });
                     } else {
                         console.log(err);
@@ -507,22 +515,22 @@ export default class UserController {
     // VERIFY USER EMAIL
     verifyUserEmail() {
         return (req, res) => {
-            this.User.findOne({ email: req.body.email }, (err, seller) => {
-                if (!seller) {
+            this.User.findOne({ email: req.body.email }, (err, user) => {
+                if (!user) {
                     return res.json({
                         code: 404,
                         message: "User not found",
                     });
                 }
-                if (seller.verificationCode === req.body.verificationCode) {
-                    seller.isVerified = true;
-                    seller.save((err, doc) => {
+                if (user.verificationCode === req.body.verificationCode) {
+                    user.isVerified = true;
+                    user.save((err, doc) => {
                         if (!err) {
                             res.status(200).json({
                                 status: true,
                                 code: 200,
                                 message: "User Verified",
-                                seller: doc,
+                                user: doc,
                             });
                         } else {
                             console.log(err);
@@ -560,7 +568,7 @@ export default class UserController {
                         res.status(500).json({
                             status: false,
                             code: 500,
-                            message: "Error loading seller data",
+                            message: "Error loading user data",
                         });
                     }
                 });
@@ -585,7 +593,7 @@ export default class UserController {
                             status: true,
                             code: 200,
                             message: "User data loaded successfully",
-                            seller: data,
+                            user: data,
                         });
                     } else {
                         console.log(err);
@@ -618,7 +626,7 @@ export default class UserController {
                             status: true,
                             code: 200,
                             message: "User data updated successfully",
-                            seller: data,
+                            user: data,
                         });
                     } else {
                         console.log(err);
