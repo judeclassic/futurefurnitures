@@ -56,7 +56,7 @@ export default class EmailHandler{
         }
     }
 
-    static async sendDeliveryMessage({email, subject, message}){
+    static async sendDeliveryMessage({email, subject, message}){ 
         try{
             console.log('sent');
         }catch(err){

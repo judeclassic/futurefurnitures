@@ -207,7 +207,9 @@ export default class UserController {
                             message: "User not found",
                         });
                     }
-                    user.profilePic = req.files[0].imagePath;
+                    if (req.files) {
+                        user.profilePic = req.files[0].imagePath;
+                    }
                     user.save((err, doc) => {
                         if (!err) {
                             res.status(200).json({
@@ -275,7 +277,6 @@ export default class UserController {
                             message: "User not found",
                         });
                     }
-                    console.log(req.body.oldPassword, user.password)
 
                     if (!req.body.oldPassword && !user.password) {
                         return res.json({
