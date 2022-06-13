@@ -92,9 +92,9 @@ export default class UserController {
                                                 status: true,
                                                 code: 200,
                                                 message: "User Registered",
-                                                user: {...doc._doc, password: null, verificationCode: null},
+                                                user: {...doc._doc, password: null, verificationCode: null, token},
                                             });
-                                            this.EmailHandler.sendVerificationEmail(doc.email, doc.verificationCode, token);
+                                            this.EmailHandler.sendVerificationEmail(doc.email, doc.verificationCode);
                                         } else {
                                             console.log(err);
                                             res.status(500).json({
