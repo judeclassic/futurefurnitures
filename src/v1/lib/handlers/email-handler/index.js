@@ -12,23 +12,31 @@ import path from 'path';
  const DEFAULT_PASSWORD = process.env.DEFAULT_PASSWORD || 'Houseinterior100';
  const DEFAULT_NAME = "House Interior";
 
-const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: DEFAULT_FROM_EMAIL, //  klas email
-        pass: DEFAULT_PASSWORD, // klas email password
-    },
-    tls: {
-        rejectUnauthorized: false,
+var transporter;
+
+const connect = () => {
+    try {
+        transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: DEFAULT_FROM_EMAIL, //  klas email
+                pass: DEFAULT_PASSWORD, // klas email password
+            },
+            tls: {
+                rejectUnauthorized: false,
+            }
+        });
+    } catch (err) {
+        console.log(err);
     }
-});
+}
 
-
+connect();
 const sendEmail =  async (/** @type {import("nodemailer/lib/mailer").Options} */ message) => {
     try {
-        let from = `${DEFAULT_FROM_EMAIL} ${DEFAULT_NAME}`;
+        // let from = `${DEFAULT_FROM_EMAIL} ${DEFAULT_NAME}`;
         
-        transporter.sendMail({...message, from});
+        // transporter.sendMail({...message, from});
 
     } catch (error) {
         console.error("Sending Email failed");
@@ -126,7 +134,6 @@ export default class EmailHandler{
             await sendEmail(message);
         }catch(err){
             console.log(err);
-            throw err;
         }
     }
 
