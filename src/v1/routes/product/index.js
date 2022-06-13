@@ -47,13 +47,16 @@ const router = ({ ProductController, Router, Authenticate, Product, User, EmailH
     productRouter.get('/getTopOfferred', productController.getTopOfferredProducts());
 
     // Get Product By Category
-    productRouter.get('/getByCategory/:category', productController.getProductByCategory() );
+    productRouter.get('/getByCategory/:category', productController.getProductByCategory());
 
     // Get Product By SubCategory
-    productRouter.get('/getBySubCategory/:subCategory', productController.getProductBySubCategory() );
+    productRouter.get('/getBySubCategory/:subCategory', productController.getProductBySubCategory());
+
+    // Get Product By Product Type
+    productRouter.get('/getByProductType/:productType', productController.getProductByProductType());
 
     // Get Product By Search
-    productRouter.get('/getBySearch/:search', productController.getProductBySearch() );
+    productRouter.get('/getBySearch/:search', productController.getProductBySearch());
 
     // Get Product By Search And Category
     productRouter.get('/getBySearchAndCategory/:search/:category', productController.getProductBySearchAndCategory() );

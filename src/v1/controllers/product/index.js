@@ -27,6 +27,7 @@ class SellerController {
                         brand,
                         category,
                         subCategory,
+                        productType,
                         featured,
                         status,
                         isVerified,
@@ -49,6 +50,7 @@ class SellerController {
                         brand,
                         category,
                         subCategory,
+                        productType,
                         featured,
                         createDate: new Date,
                         updateDate: new Date,
@@ -98,6 +100,7 @@ class SellerController {
                         brand,
                         category,
                         subCategory,
+                        productType,
                         featured,
                         status,
                         isVerified,
@@ -119,6 +122,7 @@ class SellerController {
                         brand,
                         category,
                         subCategory,
+                        productType,
                         featured,
                         createDate: new Date,
                         updateDate: new Date,
@@ -662,6 +666,47 @@ export default class ProductController extends SellerController {
             run();
         }
     }
+
+    getProductByProductType() {
+        return (req, res) => {
+            const run = async () => {
+                try {
+                    const products = await this.Product.find({
+                        productType: req.params.productType,
+                        isDeleted: false,
+                    });
+                    if (products === []) {
+                        return res.status(200).json({
+                            status: false,
+                            message: "Product not found",
+                            code: 403,
+                        });
+                    }
+                    res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "Products fetched successfully",
+                        products,
+                    });;
+
+                    products.forEach(async (product) => {
+                        product.views += 1;
+                        await product.save();
+                    });
+                }
+                catch (error) {
+                    res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: "Internal server error",
+                        error,
+                    });
+                }
+            }
+
+            run();
+        }
+    }
     
     getProductBySearch() {
         return (req, res) => {
@@ -817,9 +862,10 @@ export default class ProductController extends SellerController {
             const run = async () => {
                 try {
                     const products = await this.Product.find({
-                        rating: { $gte: req.params.minRating, $lte: req.params.maxRating },
                         isDeleted: false,
                     });
+                    const { minRating, maxRating } = req.params;
+                    const filteredProducts = products.filter((data)=>{data.rating.average > minRating && data.rating.average < maxRating});
                     if (products === []) {
                         return res.status(200).json({
                             status: false,
@@ -831,10 +877,11 @@ export default class ProductController extends SellerController {
                         status: true,
                         code: 200,
                         message: "Products fetched successfully",
-                        products,
+                        products: filteredProducts,
                     });
                 }
                 catch (error) {
+                    console.log(error)
                     res.status(500).json({
                         status: false,
                         code: 500,
