@@ -20,9 +20,9 @@ export default class UserController {
     registerUser = () => {  
         return (req, res) => {
             try{
+                console.log("BODY", req.body);
                 let hashPassword = this.bcrypt.hashSync(req.body.password, 10);
                 let code = this.generateVerificationCode();
-                console.log("BODY", req.body);
                 if (!req.body) {
                     return res.status(400).send({
                         message: 'Content can not be empty!'
@@ -122,6 +122,7 @@ export default class UserController {
     // LOGIN USER
     loginUser() {
         return (req, res) => {
+            console.log('data', req.body)
             if (!req.body) {
                 return res.status(400).send({
                     message: 'Content can not be empty!'
