@@ -22,7 +22,7 @@ export default class UserController {
             try{
                 let hashPassword = this.bcrypt.hashSync(req.body.password, 10);
                 let code = this.generateVerificationCode();
-                console.log(req.body);
+                console.log("BODY", req.body);
                 if (!req.body) {
                     return res.status(400).send({
                         message: 'Content can not be empty!'
