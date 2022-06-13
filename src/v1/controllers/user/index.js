@@ -69,13 +69,32 @@ export default class UserController {
                                     });
                                     user.save((err, doc) => {
                                         if (!err) {
+                                            const payload = {
+                                                id: user._id,
+                                                firstName: doc.firstName,
+                                                lastName: doc.lastName,
+                                                email: doc.email,
+                                                isVerified: doc.isVerified,
+                                                isAdmin: doc.isAdmin,
+                                                isActive: doc.isActive,
+                                                isDeleted: doc.isDeleted,
+                                                createDate: doc.createDate,
+                                                updateDate: doc.updateDate,
+                                                role: doc.role,
+                                                status: doc.status,
+                                                address: doc.address,
+                                                phone: doc.phone,
+                                            };
+                                            let token = this.jwt.sign(payload, `${USER_ACCESS_TOKEN_SECRET}`, {
+                                                // expiresIn: 1000 * 60 * 60 * 24 * 7,
+                                            });
                                             res.status(200).json({
                                                 status: true,
                                                 code: 200,
                                                 message: "User Registered",
                                                 user: {...doc._doc, password: null, verificationCode: null},
                                             });
-                                            this.EmailHandler.sendVerificationEmail(doc.email, doc.verificationCode);
+                                            this.EmailHandler.sendVerificationEmail(doc.email, doc.verificationCode, token);
                                         } else {
                                             console.log(err);
                                             res.status(500).json({
