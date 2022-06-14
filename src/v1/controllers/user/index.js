@@ -872,3 +872,6 @@ export default class UserController {
         return Math.floor(Math.random() * 1000000);
     }
 };
+
+
+

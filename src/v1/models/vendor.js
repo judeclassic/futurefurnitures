@@ -21,9 +21,14 @@ const Vendor = mongoose.model("vendor", {
         type: String,
         required: true
     },
+    profilePic: {
+        type: String,
+    },
     address: {
         type: String,
-        required: true
+    },
+    city: {
+        type: String,
     },
     state: {
         type: String,
@@ -59,6 +64,26 @@ const Vendor = mongoose.model("vendor", {
         type: mongoose.Schema.Types.ObjectId,
         ref: "request",
     }],
+    cardInfo: [{
+        name: {
+            type: String,
+        },
+        number: {
+            type: String,
+        },
+        cvv: {
+            type: String,
+        },
+        exp: {
+            type: String
+        }
+    }],
+    paypal: [{
+        email: String,
+    }],
+    payoneer: [{
+        email: String,
+    }]
 });
 
 export default Vendor;

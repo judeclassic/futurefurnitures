@@ -1,6 +1,6 @@
 //@ts-check
 
-const router = ({ Router, VendorController, Authenticate, Vendor, User, service, EmailHandler, PaymentHandler, bcrypt, jwt, Logger, userWithLisenceUploader }) => {
+const router = ({ Router, VendorController, Authenticate, Vendor, User, service, EmailHandler, PaymentHandler, bcrypt, jwt, Logger, userWithLisenceUploader, userUploader }) => {
     const router = Router();
 
     const vendorController = new VendorController({ EmailHandler, PaymentHandler, User, service, Vendor, Logger, bcrypt, jwt });
@@ -24,6 +24,10 @@ const router = ({ Router, VendorController, Authenticate, Vendor, User, service,
 
     router.get('/transactions/:vendorId', verifyUserToken(), vendorController.viewWithdrawFunds());
 
+    //UPDATE DETAILS
+
+    router.post('/updatePhoto', verifyUserToken(), userUploader, vendorController.updatePhoto()); // TODO: Haven't done this
+
     router.post('/profile/updatePassword', verifyUserToken(), vendorController.changeProfilePassword());
 
     router.post('/profile/updateEmail', verifyUserToken(), vendorController.changeProfileEmail());
@@ -32,7 +36,48 @@ const router = ({ Router, VendorController, Authenticate, Vendor, User, service,
 
     router.post('/profile/updateCountry', verifyUserToken(), vendorController.changeProfileCountry());
 
+    router.post('/profile/updateCountry', verifyUserToken(), vendorController.changeProfileCountry());
+
     router.post('/profile/updateState', verifyUserToken(), vendorController.changeProfileState());
+
+    //start
+
+    router.post('/profile/updateCity', verifyUserToken(), vendorController.changeProfileCity());
+
+    router.post('/profile/updatePrimaryService', verifyUserToken(), vendorController.changeProfilePrimaryService());
+
+    router.post('/profile/updatePlaceOfTraining', verifyUserToken(), vendorController.changeProfilePlaceOfTraining());
+
+    router.post('/profile/updateDiscription', verifyUserToken(), vendorController.changeProfileDiscription());
+
+    router.post('/profile/updateYearsOfExperience', verifyUserToken(), vendorController.changeProfileYearsOfExperience());
+
+    router.post('/profile/updateMembers', verifyUserToken(), vendorController.changeProfileCrewSize());
+
+
+    // FOR CARD
+    router.post('/profile/card', verifyUserToken(), vendorController.addPaymentCard());
+
+    router.get('/profile/card', verifyUserToken(), vendorController.retrievePaymentCard());
+
+    router.put('/profile/card', verifyUserToken(), vendorController.updatePaymentCard());
+
+    router.delete('/profile/card', verifyUserToken(), vendorController.removePaymentCard());
+
+    //FOR PAYPAL
+    router.delete('/profile/paypal', verifyUserToken(), vendorController.addWithPaypal());
+
+    router.delete('/profile/paypal', verifyUserToken(), vendorController.updateWithPaypal());
+
+    router.delete('/profile/paypal', verifyUserToken(), vendorController.removeWithPaypal());
+
+    //FOR PAYONEER
+    router.delete('/profile/payoneer', verifyUserToken(), vendorController.addWithPayoneer());
+
+    router.delete('/profile/payoneer', verifyUserToken(), vendorController.updateWithPayoneer());
+
+    router.delete('/profile/payoneer', verifyUserToken(), vendorController.removeWithPayoneer());
+    // end
 
     router.get('/all', vendorController.getVendors());
 

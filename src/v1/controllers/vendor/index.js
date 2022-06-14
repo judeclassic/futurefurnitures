@@ -825,6 +825,50 @@ export default class VendorController extends ServiceController {
         }
     }
 
+    updatePhoto = () => {
+        return (req, res) => {
+            const run = async () => {
+                const { id } = req.user;
+                var profilePic = req.files && req.files[0].imagePath;
+
+                const vendor = await this.vendor.findById(id);
+                if (!vendor) {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "Vendor not found",
+                    });
+                }
+                const updatedVendor = await this.vendor.findByIdAndUpdate(id, {
+                    profilePic
+                });
+                if (updatedVendor) {
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "Vendor info updated successfully",
+                        vendor: {...updatedVendor._doc, password: undefined},
+                    });
+                } else {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "Vendor info update failed",
+                    });
+                }
+            }
+
+            run().catch((err) => {
+                this.logger.error(err);
+                return res.status(403).json({
+                    status: false,
+                    code: 403,
+                    message: "Vendor info update failed",
+                });
+            });
+        }
+    }
+
     changeProfilePassword = () => {
         return (req, res) => {
             const run = async () => {
@@ -1037,6 +1081,52 @@ export default class VendorController extends ServiceController {
         }
     }
 
+    changeProfileCity = () => {
+        return (req, res) => {
+            const run = async () => {
+                const { id } = req.user
+                const {
+                    city,
+                } = req.body;
+
+                const vendor = await this.vendor.findById(id);
+                if (!vendor) {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "Vendor not found",
+                    });
+                }
+                const updatedVendor = await this.vendor.findByIdAndUpdate(id, {
+                    city,
+                });
+                if (updatedVendor) {
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "Vendor city updated successfully",
+                        vendor: {...updatedVendor._doc, password: undefined},
+                    });
+                } else {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "Vendor city update failed",
+                    });
+                }
+            }
+
+            run().catch((err) => {
+                this.logger.error(err);
+                return res.status(403).json({
+                    status: false,
+                    code: 403,
+                    message: "Vendor state update failed",
+                });
+            });
+        }
+    }
+
     changeProfileState = () => {
         return (req, res) => {
             const run = async () => {
@@ -1078,6 +1168,734 @@ export default class VendorController extends ServiceController {
                     status: false,
                     code: 403,
                     message: "Vendor state update failed",
+                });
+            });
+        }
+    }
+
+    changeProfilePrimaryService = () => {
+        return (req, res) => {
+            const run = async () => {
+                const { id } = req.user
+                const {
+                    primaryService,
+                } = req.body;
+
+                const vendor = await this.vendor.findById(id);
+                if (!vendor) {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "Vendor not found",
+                    });
+                }
+                const updatedVendor = await this.vendor.findByIdAndUpdate(id, {
+                    primaryService,
+                });
+                if (updatedVendor) {
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "Vendor primary Service updated successfully",
+                        vendor: {...updatedVendor._doc, password: undefined},
+                    });
+                } else {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "Vendor primary Service update failed",
+                    });
+                }
+            }
+
+            run().catch((err) => {
+                this.logger.error(err);
+                return res.status(403).json({
+                    status: false,
+                    code: 403,
+                    message: "Vendor primary Service update failed",
+                });
+            });
+        }
+    }
+
+    changeProfilePlaceOfTraining = () => {
+        return (req, res) => {
+            const run = async () => {
+                const { id } = req.user
+                const {
+                    place_of_training,
+                } = req.body;
+
+                const vendor = await this.vendor.findById(id);
+                if (!vendor) {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "Vendor not found",
+                    });
+                }
+                const updatedVendor = await this.vendor.findByIdAndUpdate(id, {
+                    place_of_training,
+                });
+                if (updatedVendor) {
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "Vendor location of training updated successfully",
+                        vendor: {...updatedVendor._doc, password: undefined},
+                    });
+                } else {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "Vendor location of training update failed",
+                    });
+                }
+            }
+
+            run().catch((err) => {
+                this.logger.error(err);
+                return res.status(403).json({
+                    status: false,
+                    code: 403,
+                    message: "Vendor location of training update failed",
+                });
+            });
+        }
+    }
+
+    changeProfileDiscription = () => {
+        return (req, res) => {
+            const run = async () => {
+                const { id } = req.user
+                const {
+                    description,
+                } = req.body;
+
+                const vendor = await this.vendor.findById(id);
+                if (!vendor) {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "Vendor not found",
+                    });
+                }
+                const updatedVendor = await this.vendor.findByIdAndUpdate(id, {
+                    description,
+                });
+                if (updatedVendor) {
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "Vendor description updated successfully",
+                        vendor: {...updatedVendor._doc, password: undefined},
+                    });
+                } else {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "Vendor description update failed",
+                    });
+                }
+            }
+
+            run().catch((err) => {
+                this.logger.error(err);
+                return res.status(403).json({
+                    status: false,
+                    code: 403,
+                    message: "Vendor description update failed",
+                });
+            });
+        }
+    }
+    
+    changeProfileYearsOfExperience = () => {
+        return (req, res) => {
+            const run = async () => {
+                const { id } = req.user
+                const {
+                    years_of_experience,
+                } = req.body;
+
+                const vendor = await this.vendor.findById(id);
+                if (!vendor) {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "Vendor not found",
+                    });
+                }
+                const updatedVendor = await this.vendor.findByIdAndUpdate(id, {
+                    years_of_experience,
+                });
+                if (updatedVendor) {
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "Vendor years of experience updated successfully",
+                        vendor: {...updatedVendor._doc, password: undefined},
+                    });
+                } else {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "Vendor years of experience update failed",
+                    });
+                }
+            }
+
+            run().catch((err) => {
+                this.logger.error(err);
+                return res.status(403).json({
+                    status: false,
+                    code: 403,
+                    message: "Vendor years of experience update failed",
+                });
+            });
+        }
+    }
+
+    changeProfileCrewSize = () => {
+        return (req, res) => {
+            const run = async () => {
+                const { id } = req.user
+                const {
+                    crew_size,
+                } = req.body;
+
+                const vendor = await this.vendor.findById(id);
+                if (!vendor) {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "Vendor not found",
+                    });
+                }
+                const updatedVendor = await this.vendor.findByIdAndUpdate(id, {
+                    crew_size,
+                });
+                if (updatedVendor) {
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "Vendor crew size updated successfully",
+                        vendor: {...updatedVendor._doc, password: undefined},
+                    });
+                } else {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "Vendor crew size update failed",
+                    });
+                }
+            }
+
+            run().catch((err) => {
+                this.logger.error(err);
+                return res.status(403).json({
+                    status: false,
+                    code: 403,
+                    message: "Vendor crew size update failed",
+                });
+            });
+        }
+    }
+
+    addPaymentCard = () => {
+        return (req, res) => {
+            const run = async () => {
+                const { id } = req.user
+                const {
+                    name,
+                    number,
+                    cvv,
+                    exp
+                } = req.body;
+
+                if ( !name || !number || !cvv || !exp ) {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "Please enter complete details name, number, cvv and exp",
+                    });
+                }
+
+                const newNumber = await this.jwt.sign({card: number}, USER_ACCESS_TOKEN_SECRET);
+
+                const vendor = await this.vendor.findById(id);
+                if (!vendor) {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "Vendor not found",
+                    });
+                }
+                const updatedVendor = await this.vendor.findByIdAndUpdate(id, {
+                    $push: {
+                        cardInfo: {
+                            name,
+                            number: newNumber,
+                            cvv,
+                            exp
+                        }
+                    }
+                });
+                if (updatedVendor) {
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "Vendor Card added successfully updated successfully",
+                        vendor: {...updatedVendor._doc, password: undefined},
+                    });
+                } else {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "Vendor Card update failed",
+                    });
+                }
+            }
+
+            run().catch((err) => {
+                this.logger.error(err);
+                return res.status(403).json({
+                    status: false,
+                    code: 403,
+                    message: "Vendor Card update failed",
+                });
+            });
+        }
+    }
+
+    retrievePaymentCard = () => {
+        return (req, res) => {
+            const run = async () => {
+                const { id } = req.user
+
+                const vendor = await this.vendor.findById(id);
+                if (!vendor) {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "Vendor not found",
+                    });
+                }
+
+                if (!vendor.cardInfo || vendor.cardInfo === []) {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "No available Card",
+                    });
+                }
+
+                const cards = []
+                vendor.cardInfo.map(async (card, index)=> {
+                    let decoded= await this.jwt.verify(card.number, USER_ACCESS_TOKEN_SECRET);
+                    cards.push({...card._doc, number: decoded.card}); 
+                    if ( index === (vendor.cardInfo.length -1) ){
+                        return res.status(200).json({
+                            status: true,
+                            code: 200,
+                            message: "Vendor Card retrieved successfully",
+                            cards,
+                        });
+                    }
+                });
+            }
+
+            run().catch((err) => {
+                this.logger.error(err);
+                return res.status(403).json({
+                    status: false,
+                    code: 403,
+                    message: "Vendor Card update failed",
+                });
+            });
+        }
+    }
+
+    updatePaymentCard = () => {
+        return (req, res) => {
+            const run = async () => {
+                const { id } = req.user
+
+                var info = req.body;
+
+                if (req.body.number) {
+                    info.number = await this.jwt.sign({card: req.body.number}, USER_ACCESS_TOKEN_SECRET);
+                }
+
+                const vendor = await this.vendor.findById(id);
+                if (!vendor) {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "Vendor not found",
+                    });
+                }
+
+                vendor.cardInfo[info.cardId] = {...info};
+
+                const updatedVendor = await vendor.save();
+
+                if (updatedVendor) {
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "Vendor Card updated successfully",
+                        vendor: {...updatedVendor._doc, password: undefined},
+                    });
+                } else {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "Vendor Card update failed",
+                    });
+                }
+            }
+
+            run().catch((err) => {
+                this.logger.error(err);
+                return res.status(403).json({
+                    status: false,
+                    code: 403,
+                    message: "Vendor Card update failed",
+                });
+            });
+        }
+    }
+
+    removePaymentCard = () => {
+        return (req, res) => {
+            const run = async () => {
+                const { id } = req.user
+
+                const vendor = await this.vendor.findById(id);
+                if (!vendor) {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "Vendor not found",
+                    });
+                }
+                const updatedVendor = await this.vendor.findByIdAndUpdate(id, {
+                    $pull: {
+                        cardInfo: {
+                            id: req.body.cardId
+                        }
+                    }
+                });
+                if (updatedVendor) {
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "Vendor Card added successfully",
+                        vendor: {...updatedVendor._doc, password: undefined},
+                    });
+                } else {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "Vendor Card update failed",
+                    });
+                }
+            }
+
+            run().catch((err) => {
+                this.logger.error(err);
+                return res.status(403).json({
+                    status: false,
+                    code: 403,
+                    message: "Vendor Card update failed",
+                });
+            });
+        }
+    }
+
+    addWithPaypal = () => {
+        return (req, res) => {
+            const run = async () => {
+                const { id } = req.user
+                const {
+                    email,
+                } = req.body;
+
+                const vendor = await this.vendor.findById(id);
+                if (!vendor) {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "Vendor not found",
+                    });
+                }
+                const updatedVendor = await this.vendor.findByIdAndUpdate(id, {
+                    $push: {
+                        paypal: {
+                            email,
+                        }
+                    }
+                });
+                if (updatedVendor) {
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "Vendor paypal details updated successfully",
+                        vendor: {...updatedVendor._doc, password: undefined},
+                    });
+                } else {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "Vendor paypal details update failed",
+                    });
+                }
+            }
+
+            run().catch((err) => {
+                this.logger.error(err);
+                return res.status(403).json({
+                    status: false,
+                    code: 403,
+                    message: "Vendor paypal details update failed",
+                });
+            });
+        }
+    }
+
+    updateWithPaypal = () => {
+        return (req, res) => {
+            const run = async () => {
+                const { id } = req.user
+                var info = info = req.body;
+
+                const vendor = await this.vendor.findById(id);
+                if (!vendor) {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "Vendor not found",
+                    });
+                }
+                vendor.paypal[info.paypalId] = {...info};
+
+                const updatedVendor = await vendor.save();
+                if (updatedVendor) {
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "Vendor paypal details updated successfully",
+                        vendor: {...updatedVendor._doc, password: undefined},
+                    });
+                } else {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "Vendor paypal details update failed",
+                    });
+                }
+            }
+
+            run().catch((err) => {
+                this.logger.error(err);
+                return res.status(403).json({
+                    status: false,
+                    code: 403,
+                    message: "Vendor paypal details update failed",
+                });
+            });
+        }
+    }
+
+    removeWithPaypal = () => {
+        return (req, res) => {
+            const run = async () => {
+                const { id } = req.user
+
+                const vendor = await this.vendor.findById(id);
+                if (!vendor) {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "Vendor not found",
+                    });
+                }
+
+                const updatedVendor = await this.vendor.findByIdAndUpdate(id, {
+                    $pull: {
+                        cardInfo: {
+                            id: req.body.paypalId
+                        }
+                    }
+                });
+
+                if (updatedVendor) {
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "Vendor paypal details updated successfully",
+                        vendor: {...updatedVendor._doc, password: undefined},
+                    });
+                } else {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "Vendor paypal details update failed",
+                    });
+                }
+            }
+
+            run().catch((err) => {
+                this.logger.error(err);
+                return res.status(403).json({
+                    status: false,
+                    code: 403,
+                    message: "Vendor paypal details update failed",
+                });
+            });
+        }
+    }
+
+    addWithPayoneer = () => {
+        return (req, res) => {
+            const run = async () => {
+                const { id } = req.user
+                const {
+                    email,
+                } = req.body;
+
+                const vendor = await this.vendor.findById(id);
+                if (!vendor) {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "Vendor not found",
+                    });
+                }
+                const updatedVendor = await this.vendor.findByIdAndUpdate(id, {
+                    $push: {
+                        payoneer: {
+                            email,
+                        }
+                    }
+                });
+                if (updatedVendor) {
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "Vendor payoneer details updated successfully",
+                        vendor: {...updatedVendor._doc, password: undefined},
+                    });
+                } else {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "Vendor payoneer details update failed",
+                    });
+                }
+            }
+
+            run().catch((err) => {
+                this.logger.error(err);
+                return res.status(403).json({
+                    status: false,
+                    code: 403,
+                    message: "Vendor payoneer details update failed",
+                });
+            });
+        }
+    }
+
+    updateWithPayoneer = () => {
+        return (req, res) => {
+            const run = async () => {
+                const { id } = req.user
+                var info = info = req.body;
+
+                const vendor = await this.vendor.findById(id);
+                if (!vendor) {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "Vendor not found",
+                    });
+                }
+                vendor.payoneer[info.payoneerId] = {...info};
+
+                const updatedVendor = await vendor.save();
+                if (updatedVendor) {
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "Vendor payoneer details updated successfully",
+                        vendor: {...updatedVendor._doc, password: undefined},
+                    });
+                } else {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "Vendor payoneer details update failed",
+                    });
+                }
+            }
+
+            run().catch((err) => {
+                this.logger.error(err);
+                return res.status(403).json({
+                    status: false,
+                    code: 403,
+                    message: "Vendor payoneer details update failed",
+                });
+            });
+        }
+    }
+    
+    removeWithPayoneer = () => {
+        return (req, res) => {
+            const run = async () => {
+                const { id } = req.user
+
+                const vendor = await this.vendor.findById(id);
+                if (!vendor) {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "Vendor not found",
+                    });
+                }
+
+                const updatedVendor = await this.vendor.findByIdAndUpdate(id, {
+                    $pull: {
+                        payoneer: {
+                            id: req.body.payoneerId
+                        }
+                    }
+                });
+
+                if (updatedVendor) {
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "Vendor payoneer details updated successfully",
+                        vendor: {...updatedVendor._doc, password: undefined},
+                    });
+                } else {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "Vendor paypayoneer details update failed",
+                    });
+                }
+            }
+
+            run().catch((err) => {
+                this.logger.error(err);
+                return res.status(403).json({
+                    status: false,
+                    code: 403,
+                    message: "Vendor paypal details update failed",
                 });
             });
         }
@@ -1135,27 +1953,6 @@ export default class VendorController extends ServiceController {
             });
         }
     }
-
-                
-
-
-                
-
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     getVendors = () => {
         return (req, res) => {
