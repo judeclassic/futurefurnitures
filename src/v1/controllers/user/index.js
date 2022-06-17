@@ -827,18 +827,23 @@ export default class UserController {
                         console.log(data.cart);
 
                         const final = async () => {
-                            var products = [];
+                            var cart = [];
+                            var numb = 0;
 
                             await data.cart.map(async (item) => {
                                 var product = await this.Product.findById(item);
-                                products.push(product);
+                                numb = numb + 1;
 
-                                if (products.length === data.cart.length) {
+                                if (product){
+                                    cart.push(product === null);
+                                }
+
+                                if (numb === data.cart.length) {
                                     res.status(200).json({
                                         status: true,
                                         code: 200,
                                         message: "Cart data loaded successfully",
-                                        cart: products,
+                                        cart,
                                     });
                                 }
                             });
