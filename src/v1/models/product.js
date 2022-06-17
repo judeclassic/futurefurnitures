@@ -60,6 +60,20 @@ const Product = mongoose.model('product', mongoose.Schema({
   brand: {
     type: String,
   },
+  location: {
+    country: {
+      type: String
+    },
+    state: {
+      type: String
+    },
+    city: {
+      type: String
+    },
+  },
+  asset_3d_baseurl: {
+    type: String
+  },
   color: [{
     type: String,
   }],

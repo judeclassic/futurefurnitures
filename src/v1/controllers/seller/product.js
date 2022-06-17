@@ -1,3 +1,4 @@
+//@ts-check
 import Transaction from "./finance";
 
 export default class ProductController {
@@ -34,6 +35,8 @@ export default class ProductController {
                         status,
                     } = req.body;
 
+                    const location = req.body.location && JSON.parse(req.body.location);
+
                     const product = new this.Product({
                         name,
                         description,
@@ -45,6 +48,7 @@ export default class ProductController {
                         dimensions,
                         weight,
                         seller,
+                        location,
                         currectPrice,
                         quantity,
                         brand,
@@ -68,7 +72,7 @@ export default class ProductController {
                     // console.log(error);
                     return res.status(500).json({
                         status: false,
-                        code: 500,
+                        code: 403,
                         message: error.message,
                     });
                 }

@@ -23,8 +23,10 @@ class SellerController {
                         weight,
                         seller,
                         currectPrice,
+                        asset_3d_baseurl,
                         quantity,
                         brand,
+                        location,
                         category,
                         subCategory,
                         productType,
@@ -46,8 +48,10 @@ class SellerController {
                         weight,
                         seller,
                         currectPrice,
+                        asset_3d_baseurl,
                         quantity,
                         brand,
+                        location,
                         category,
                         subCategory,
                         productType,
@@ -96,6 +100,7 @@ class SellerController {
                         weight,
                         seller,
                         currectPrice,
+                        asset_3d_baseurl,
                         quantity,
                         brand,
                         category,
@@ -106,6 +111,11 @@ class SellerController {
                         isVerified,
                         isActive,
                     } = req.body;
+
+                    const location = req.body.location
+                        && typeof (req.body.location) === "string"
+                        ? JSON.parse(req.body.location)
+                        : req.body.location;
 
                     const product = new this.Product({
                         name,
@@ -118,8 +128,10 @@ class SellerController {
                         weight,
                         seller,
                         currectPrice,
+                        asset_3d_baseurl,
                         quantity,
                         brand,
+                        location,
                         category,
                         subCategory,
                         productType,

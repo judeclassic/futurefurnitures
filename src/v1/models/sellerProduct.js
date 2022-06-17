@@ -35,6 +35,17 @@ const SellerProduct = mongoose.model('sellerProduct', mongoose.Schema({
     type: String,
     required: true,
   },
+  location: {
+    country: {
+      type: String
+    },
+    state: {
+      type: String
+    },
+    city: {
+      type: String
+    },
+  },
   color: [{
     type: String,
     required: true,
@@ -55,19 +66,6 @@ const SellerProduct = mongoose.model('sellerProduct', mongoose.Schema({
     type: Number,
     required: true,
   },
-  rating: [{
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'user',
-    },
-    rating: {
-      type: Number,
-      required: true,
-    },
-    comment: {
-      type: String,
-    },
-  }],
   impression: {
     type: Number,
     default: 0,

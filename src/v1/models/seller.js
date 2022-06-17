@@ -23,6 +23,7 @@ const Seller= mongoose.model("Seller", mongoose.Schema({
   },
   profilePic: {
     type: String,
+    default: ''
   },
   address: {
     type: String,
