@@ -835,7 +835,7 @@ export default class UserController {
                                 numb = numb + 1;
 
                                 if (product){
-                                    cart.push(product === null);
+                                    cart.push(product);
                                 }
 
                                 if (numb === data.cart.length) {
