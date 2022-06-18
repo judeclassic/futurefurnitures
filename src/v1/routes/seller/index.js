@@ -115,6 +115,12 @@ const router = ({ Router, SellerController, Seller, SellerProduct, Authenticate,
         sellerController.getAllProducts()
     );
 
+    // Get All Products
+    router.get(
+        "/products/top",
+        sellerController.getTopPicksProduct()
+    );
+
     // Get Product
     router.get(
         "/product/:id",

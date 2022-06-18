@@ -37,7 +37,7 @@ export default class ProductController {
 
                     const location = req.body.location && JSON.parse(req.body.location);
 
-                    const product = new this.Product({
+                    const products = new this.Product({
                         name,
                         description,
                         image,
@@ -62,11 +62,11 @@ export default class ProductController {
                         isActive: true,
                     });
 
-                    await product.save();
+                    await products.save();
                     return res.status(200).json({
                         status: true,
                         code: 200,
-                        data: product,
+                        products,
                     });
                 } catch (error) {
                     // console.log(error);
@@ -93,7 +93,7 @@ export default class ProductController {
                     return res.status(200).json({
                         status: true,
                         code: 200,
-                        data: products,
+                        products,
                     });
                 }
                 catch (error) {
@@ -110,16 +110,41 @@ export default class ProductController {
         }
     }
 
+    getTopPicksProduct() {
+        return (req, res) => {
+            const run = async () => {
+                try{
+                    const { id } = req.params;
+                    const products = await this.Product.findById(id);
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        products,
+                    });
+                }
+                catch (error) {
+                    // console.log(error);
+                    return res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: error.message,
+                    });
+                }
+            }
+            
+            return run();
+        }
+    }
     getSellerProduct() {
         return (req, res) => {
             const run = async () => {
                 try{
                     const { id } = req.params;
-                    const product = await this.Product.findById(id);
+                    const products = await this.Product.findById(id);
                     return res.status(200).json({
                         status: true,
                         code: 200,
-                        data: product,
+                        products,
                     });
                 }
                 catch (error) {
@@ -142,13 +167,13 @@ export default class ProductController {
                 try{
                     const { id } = req.params;
                     
-                    const product = await this.Product.findByIdAndUpdate(id, req.body, { new: true });
+                    const products = await this.Product.findByIdAndUpdate(id, req.body, { new: true });
                     this.EmailHandler.sendSellerEmail({product});
                     return res.status(200).json({
                         status: true,
                         code: 200,
                         message: 'Product updated successfully',
-                        product: product,
+                        product: products,
                     });
                 } catch (error) {
                     return res.status(500).json({
@@ -169,11 +194,11 @@ export default class ProductController {
                 try{
                     const { id } = req.params;
                     const image = req.files.map(file => file.imagePath);
-                    const product = await this.Product.findByIdAndUpdate(id, { image }, { new: true });
+                    const products = await this.Product.findByIdAndUpdate(id, { image }, { new: true });
                     return res.status(200).json({
                         status: true,
                         code: 200,
-                        data: product,
+                        data: products,
                     });
                 }
                 catch (error) {
@@ -195,20 +220,20 @@ export default class ProductController {
             const run = async () => {
                 try {
                     const { id } = req.params;
-                    const product = await this.Product.findByIdAndDelete(id);
-                    if (!product) {
+                    const products = await this.Product.findByIdAndDelete(id);
+                    if (!products) {
                         return res.status(200).json({
                             status: false,
                             message: "Product do not exist or have already been deleted",
                             code: 201,
                         });
                     }
-                    this.EmailHandler.sendSellerEmail({product});
+                    this.EmailHandler.sendSellerEmail({products});
                     return res.status(200).json({
                         status: true,
                         code: 200,
                         message: "Product deleted successfully",
-                        data: product,
+                        data: products,
                     });
                 } catch {
                     return res.status(200).json({
@@ -228,8 +253,8 @@ export default class ProductController {
             const run = async () => {
                 try {
                     const { id } = req.params;
-                    const product = await this.Product.findByIdAndUpdate(id, { status: 'sold' }, { new: true });
-                    if (!product) {
+                    const products = await this.Product.findByIdAndUpdate(id, { status: 'sold' }, { new: true });
+                    if (!products) {
                         return res.status(200).json({
                             status: false,
                             message: "Product do not exist or have already been deleted",
@@ -240,7 +265,7 @@ export default class ProductController {
                         status: true,
                         code: 200,
                         message: "Product updated successfully",
-                        product: product,
+                        products,
                     });
                 }
                 catch {
@@ -313,19 +338,19 @@ export default class ProductController {
                 try {
                     if (req.params.id) {
                         const { id } = req.params;
-                        const product = await this.Product.findByIdAndUpdate(id, {...req.body, status: 'active'}, { new: true });
+                        const products = await this.Product.findByIdAndUpdate(id, {...req.body, status: 'active'}, { new: true });
                         return res.status(200).json({
                             status: true,
                             code: 200,
                             message: "Product saved as active successfully",
-                            product,
+                            products,
                         });
                     }
-                    const product = await this.Product.create({...req.body, isActive: true, isVerified: true, status: 'active', isDeleted: false});
+                    const products = await this.Product.create({...req.body, isActive: true, isVerified: true, status: 'active', isDeleted: false});
                     return res.status(200).json({
                         status: true,
                         code: 200,
-                        data: product,
+                        data: products,
                     });
                 }
                 catch (error) {
@@ -372,19 +397,19 @@ export default class ProductController {
                 try {
                     if (req.params.id) {
                         const { id } = req.params;
-                        const product = await this.Product.findByIdAndUpdate(id, {...req.body, status: 'drafted'}, { new: true });
+                        const products = await this.Product.findByIdAndUpdate(id, {...req.body, status: 'drafted'}, { new: true });
                         return res.status(200).json({
                             status: true,
                             code: 200,
-                            data: product,
+                            data: products,
                         });
                     }
-                    const product = await this.Product.create(req.body)
+                    const products = await this.Product.create(req.body)
                     return res.status(200).json({
                         status: true,
                         code: 200,
                         message: "Product saved as drafted successfully",
-                        product,
+                        products,
                     });
                 }
                 catch (error) {
@@ -436,7 +461,7 @@ export default class ProductController {
                     return res.status(200).json({
                         status: true,
                         code: 200,
-                        data: products,
+                        products,
                     });
                 } catch (error) {
                     return res.status(500).json({
@@ -486,7 +511,7 @@ export default class ProductController {
                     return res.status(200).json({
                         status: true,
                         code: 200,
-                        data: products,
+                        products,
                     });
                 } catch (error) {
                     return res.status(500).json({
@@ -536,7 +561,7 @@ export default class ProductController {
                     return res.status(200).json({
                         status: true,
                         code: 200,
-                        data: products,
+                        products,
                     });
                 } catch (error) {
                     console.log(error);
@@ -557,14 +582,14 @@ export default class ProductController {
             const run = async () => {
                 try {
                     const { id } = req.params;
-                    const product = await this.Product.findById(id);
+                    const products = await this.Product.findById(id);
                     const buyer = await this.Seller.findByIdAndUpdate(req.user.id, { $push: { savedProducts: product } }, { new: true });
                     
                     return res.status(200).json({
                         status: true,
                         code: 200,
                         message: "Product saved successfully",
-                        product,
+                        products,
                     });
                 } catch (error) {
                     return res.status(500).json({
