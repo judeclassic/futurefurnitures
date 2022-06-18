@@ -378,11 +378,21 @@ export default class VendorController extends ServiceController {
     signUpVendor = () => {
         return (req, res) => {
             const run = async () => {
+                var image = req.files && req.files.crew_image ? req.files.crew_image.map(file => file.imagePath) : [];
+                var license = req.files && req.files.license ? req.files.license.map(file => file.lisencePath) : [];
+
                 const {
                     name,
                     email,
                     phone,
                     address,
+                    primary_service,
+                    place_of_training,
+                    service_years,
+                    crew_size,
+                    state,
+                    city,
+                    discription,
                 } = req.body;
 
                 const password = this.bcrypt.hashSync(req.body.password, 10);
@@ -413,6 +423,15 @@ export default class VendorController extends ServiceController {
                     name,
                     phone,
                     address,
+                    primary_service,
+                    place_of_training,
+                    service_years,
+                    crew_size,
+                    state,
+                    city,
+                    discription,
+                    image,
+                    license
                 });
                 
                 if (vendor) {

@@ -6,7 +6,7 @@ const router = ({ Router, VendorController, Authenticate, Vendor, User, service,
     const vendorController = new VendorController({ EmailHandler, PaymentHandler, User, service, Vendor, Logger, bcrypt, jwt });
     const { verifyUserToken } = new Authenticate({ User, bcrypt, jwt });
 
-    router.post('/signUp', vendorController.signUpVendor());
+    router.post('/signUp', userWithLisenceUploader, vendorController.signUpVendor());
 
     router.post('/login', vendorController.loginVendor());
     
