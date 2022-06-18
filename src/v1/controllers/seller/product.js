@@ -168,7 +168,7 @@ export default class ProductController {
                     const { id } = req.params;
                     
                     const products = await this.Product.findByIdAndUpdate(id, req.body, { new: true });
-                    this.EmailHandler.sendSellerEmail({product});
+                    this.EmailHandler.sendSellerEmail({products});
                     return res.status(200).json({
                         status: true,
                         code: 200,
@@ -583,7 +583,7 @@ export default class ProductController {
                 try {
                     const { id } = req.params;
                     const products = await this.Product.findById(id);
-                    const buyer = await this.Seller.findByIdAndUpdate(req.user.id, { $push: { savedProducts: product } }, { new: true });
+                    const buyer = await this.Seller.findByIdAndUpdate(req.user.id, { $push: { savedProducts: products } }, { new: true });
                     
                     return res.status(200).json({
                         status: true,
