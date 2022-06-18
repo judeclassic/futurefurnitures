@@ -392,7 +392,7 @@ export default class VendorController extends ServiceController {
                     crew_size,
                     state,
                     city,
-                    discription,
+                    description,
                 } = req.body;
 
                 const password = this.bcrypt.hashSync(req.body.password, 10);
@@ -429,7 +429,7 @@ export default class VendorController extends ServiceController {
                     crew_size,
                     state,
                     city,
-                    discription,
+                    description,
                     image,
                     license
                 });
@@ -523,7 +523,7 @@ export default class VendorController extends ServiceController {
                         crew_size,
                         state,
                         city,
-                        discription,
+                        description,
                     } = req.body;
 
                     const vendor = await this.vendor.findById(id);
@@ -541,7 +541,7 @@ export default class VendorController extends ServiceController {
                         crew_size,
                         state,
                         city,
-                        discription,
+                        description,
                     });
                     if (updatedVendor) {
                         return res.status(200).json({
