@@ -21,9 +21,6 @@ const User= mongoose.model("User", mongoose.Schema({
     required: true,
     unique: true,
   },
-  address: {
-    type: String,
-  },
   verified: {
     type: Boolean,
     default: false,
@@ -63,6 +60,10 @@ const User= mongoose.model("User", mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     ref: "Product",
   }],
+  savedProducts: [{
+    type: mongoose.Schema.ObjectId,
+    ref: "Product",
+  }],
   boughtProducts: [{
     type: mongoose.Schema.ObjectId,
     ref: "Product",
@@ -79,6 +80,55 @@ const User= mongoose.model("User", mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     ref: "Comment",
   }],
+  shipingInformations: [{
+    firstName: { 
+      type: String
+    },
+    lastName: { 
+      type: String
+    },
+    email: { 
+      type: String
+    },
+    phone: { 
+      type: String
+    },
+    address: { 
+      type: String
+    },
+    city: { 
+      type: String
+    },
+    state: { 
+      type: String
+    },
+    country: { 
+      type: String
+    },
+    postalCode: { 
+      type: String
+    },
+  }],
+  cardInfo: [{
+    name: {
+        type: String,
+    },
+    number: {
+        type: String,
+    },
+    cvv: {
+        type: String,
+    },
+    exp: {
+        type: String
+    },
+    paypal: [{
+      email: String,
+    }],
+    payoneer: [{
+      email: String,
+  }]
+}],
 }));
 
 export default User;

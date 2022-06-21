@@ -173,7 +173,7 @@ const router = ({ Router, SellerController, Seller, SellerProduct, Authenticate,
 
     // Get Seller Pending Products
     router.get(
-        "/products/pending/:id",
+        "/products/pending/:sellerId",
         verifySellerToken(),
         sellerController.getSellerPendingProducts()
     );
@@ -187,7 +187,7 @@ const router = ({ Router, SellerController, Seller, SellerProduct, Authenticate,
 
     // Get Seller Active Products
     router.get(
-        "/products/active/:id",
+        "/products/active/:sellerId",
         verifySellerToken(),
         sellerController.getSellerActiveProducts()
     );
@@ -201,7 +201,7 @@ const router = ({ Router, SellerController, Seller, SellerProduct, Authenticate,
 
     // Get Seller Drafted Products
     router.get(
-        "/products/drafted/:id",
+        "/products/drafted/:sellerId",
         verifySellerToken(),
         sellerController.getSellerDraftedProducts()
     );

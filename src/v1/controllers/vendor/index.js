@@ -2004,7 +2004,7 @@ export default class VendorController extends ServiceController {
         }
     }
 
-    getVendor = () => {
+    getVendorDetailsWithOutAuth = () => {
         /**
          * @param {object} res
          * @param {object} req
@@ -2014,6 +2014,45 @@ export default class VendorController extends ServiceController {
         return (req, res) => {
             const run = async () => {
                 const { id } = req.params;
+
+                const vendor = await this.vendor.findById(id);
+                if (vendor) {
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "Vendor fetched successfully",
+                        vendor: {...vendor._doc, password: undefined},
+                    });
+                } else {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "Vendor fetch failed",
+                    });
+                }
+            }
+
+            run().catch((err) => {
+                this.logger.error(err);
+                return res.status(403).json({
+                    status: false,
+                    code: 403,
+                    message: "Vendor fetch failed",
+                });
+            });
+        }
+    }
+
+    getVendor = () => {
+        /**
+         * @param {object} res
+         * @param {object} req
+         * @returns {object}
+         */
+
+        return (req, res) => {
+            const run = async () => {
+                const { id } = req.user;
                 const vendor = await this.vendor.findById(id);
                 if (vendor) {
                     return res.status(200).json({

@@ -139,8 +139,8 @@ export default class ProductController {
         return (req, res) => {
             const run = async () => {
                 try{
-                    const { id } = req.params;
-                    const products = await this.Product.findById(id);
+                    const { sellerId } = req.params;
+                    const products = await this.Product.findById(sellerId);
                     return res.status(200).json({
                         status: true,
                         code: 200,
@@ -198,7 +198,7 @@ export default class ProductController {
                     return res.status(200).json({
                         status: true,
                         code: 200,
-                        data: products,
+                        products,
                     });
                 }
                 catch (error) {
@@ -233,7 +233,7 @@ export default class ProductController {
                         status: true,
                         code: 200,
                         message: "Product deleted successfully",
-                        data: products,
+                        products,
                     });
                 } catch {
                     return res.status(200).json({
@@ -350,7 +350,7 @@ export default class ProductController {
                     return res.status(200).json({
                         status: true,
                         code: 200,
-                        data: products,
+                        products,
                     });
                 }
                 catch (error) {
@@ -370,9 +370,10 @@ export default class ProductController {
     getSellerActiveProducts = () => {
         return (req, res) => {
             const run = async () => {
+                console.log('yeah');
                 try {
-                    const { id } = req.params;
-                    const products = await this.Product.find({ seller: id, status: 'active' });
+                    const { sellerId } = req.params;
+                    const products = await this.Product.find({ seller: sellerId, status: 'active' });
                     return res.status(200).json({
                         status: true,
                         code: 200,
@@ -401,7 +402,7 @@ export default class ProductController {
                         return res.status(200).json({
                             status: true,
                             code: 200,
-                            data: products,
+                            products,
                         });
                     }
                     const products = await this.Product.create(req.body)
@@ -429,8 +430,8 @@ export default class ProductController {
         return (req, res) => {
             const run = async () => {
                 try {
-                    const { id } = req.params;
-                    const products = await this.Product.find({ seller: id, status: 'drafted' });
+                    const { sellerId } = req.params;
+                    const products = await this.Product.find({ seller: sellerId, status: 'drafted' });
                     return res.status(200).json({
                         status: true,
                         code: 200,
@@ -456,8 +457,8 @@ export default class ProductController {
         return (req, res) => {
             const run = async () => {
                 try {
-                    const { id } = req.params;
-                    const products = await this.Product.find({ seller: id, status: 'pending' });
+                    const { sellerId } = req.params;
+                    const products = await this.Product.find({ seller: sellerId, status: 'pending' });
                     return res.status(200).json({
                         status: true,
                         code: 200,
@@ -506,8 +507,8 @@ export default class ProductController {
         return (req, res) => {
             const run = async () => {
                 try {
-                    const { id } = req.params;
-                    const products = await this.Product.find({ seller: id, isDeleted: true });
+                    const { sellerId } = req.params;
+                    const products = await this.Product.find({ seller: sellerId, isDeleted: true });
                     return res.status(200).json({
                         status: true,
                         code: 200,

@@ -13,6 +13,7 @@ const OrderModel = mongoose.model('Order' , mongoose.Schema({
     },
     quantity: {
         type: Number,
+        default: 1,
         required: true,
     },
     price: {
@@ -21,12 +22,24 @@ const OrderModel = mongoose.model('Order' , mongoose.Schema({
     },
     totalPrice: {
         type: Number,
-        required: true,
     },
     isDeleted: {
         type: Boolean,
         default: false,
     },
+    shipping: {
+        firstName: { type: String},
+        lastName: { type: String},
+        email: { type: String},
+        phone: { type: String},
+        address: { type: String},
+        city: { type: String},
+        state: { type: String},
+        country: { type: String},
+        postalCode: { type: String},
+    },
+
+    
 }));
 
         

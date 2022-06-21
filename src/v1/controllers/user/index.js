@@ -871,7 +871,822 @@ export default class UserController {
         }
     }
 
+    moveProductToSave = () => {
+        return (req, res) => {
+            try {
+                this.User.findByIdAndUpdate(req.user.id, {
+                    $push: {
+                        savedProducts: req.params.productId,
+                    },
+                    $pull: {
+                        cart: req.params.productId,
+                    },
+                }, (err, data) => {
+                    if (!err) {
+                        res.status(200).json({
+                            status: true,
+                            code: 200,
+                            message: "Product added to your saved products successfully",
+                            user: data,
+                        });
+                    } else {
+                        console.log(err);
+                        res.status(500).json({
+                            status: false,
+                            code: 500,
+                            message: "Product could not be saved",
+                        });
+                    }
+                });
+            } catch (err) {
+                console.log(err);
+                res.status(500).json({
+                    status: false,
+                    code: 500,
+                    message: "Product could not be saved",
+                });
+            }
+        }
+    }
 
+    moveProductToCart = () => {
+        return (req, res) => {
+            try {
+                this.User.findByIdAndUpdate(req.user.id, {
+                    $push: {
+                        cart: req.params.productId,
+                    },
+                    $pull: {
+                        savedProducts: req.params.productId,
+                    },
+                }, (err, data) => {
+                    if (!err) {
+                        res.status(200).json({
+                            status: true,
+                            code: 200,
+                            message: "Product added to your cart successfully",
+                            user: data,
+                        });
+                    } else {
+                        console.log(err);
+                        res.status(500).json({
+                            status: false,
+                            code: 500,
+                            message: "Product could not be cart",
+                        });
+                    }
+                });
+            } catch (err) {
+                console.log(err);
+                res.status(500).json({
+                    status: false,
+                    code: 500,
+                    message: "Product could not be saved",
+                });
+            }
+        }
+    }
+
+    // Get Cart Data
+    getSavedProducts = () => {
+        return (req, res) => {
+            try {
+                this.User.findById(req.user.id, (err, data) => {
+                    if (!err) {
+                        if (data.savedProducts === undefined || data.savedProducts.length === 0) {
+                            return res.status(200).json({
+                                status: true,
+                                code: 200,
+                                message: "Cart is empty",
+                                products: [],
+                            });
+                        }
+
+                        const final = async () => {
+                            var savedProducts = [];
+                            var numb = 0;
+
+                            await data.savedProducts.map(async (item) => {
+                                var product = await this.Product.findById(item);
+                                numb = numb + 1;
+
+                                if (product){
+                                    savedProducts.push(product);
+                                }
+
+                                if (numb === data.cart.length) {
+                                    res.status(200).json({
+                                        status: true,
+                                        code: 200,
+                                        message: "Cart data loaded successfully",
+                                        products: savedProducts,
+                                    });
+                                }
+                            });
+                        }
+
+                        return final();
+                    } else {
+                        console.log(err);
+                        res.status(500).json({
+                            status: false,
+                            code: 500,
+                            message: "Cart data not loaded",
+                        });
+                    }
+                });
+
+            } catch (err) {
+                console.log(err);
+                res.status(500).json({
+                    status: false,
+                    code: 500,
+                    message: "Cart data not loaded",
+                });
+            }
+        }
+    }
+
+    createShippingInfo = ()=> {
+        return (req, res) => {
+            const run = async () => {
+                try{
+                    const { id } = req.user;
+                    const { firstName, lastName, email, phone, address, city, state, country, postalCode, defaultLocation } = req.body;
+                    if (!address || !city || !state || !country || !postalCode) {
+                        res.status(403).json({
+                            code: 403,
+                            status: false,
+                            message: 'Imcomplete data please check and update data'
+                        });
+                        return;
+                    }
+                    console.log(defaultLocation);
+                    if (defaultLocation) {
+                        const user = await this.User.findById(id);
+                        var newLocations = [];
+                        for (var l = 0; l < user.shipingInformations; l++) {
+                            let location = {...user.shipingInformations[l], defaultLocation: false};
+                            newLocations.push(location);
+                        }
+                        user.shipingInformations = newLocations;
+                        await user.save();
+                    }
+
+                    const user = await this.User.findByIdAndUpdate(id, {
+                        $push: {
+                            shipingInformations: { firstName, lastName, email, phone, address, city, state, country, postalCode, defaultLocation }
+                        }
+                    });
+
+                    console.log('location', user.shipingInformations)
+
+                    if (!user) {
+                        res.status(403).json({
+                            code: 403,
+                            status: false,
+                            message: 'Unable to update of create new location'
+                        });
+                        return;
+                    }
+
+                    res.status(200).json({
+                        code: 200,
+                        status: true,
+                        message: 'Adding of location was successful',
+                        shipingInformations: user.shipingInformations || []
+                    });
+
+                    return;
+                } catch (err) {
+                    res.status(500).json({
+                        code: 403,
+                        status: false,
+                        message: err
+                    });
+                }
+            }
+
+            run();
+        }
+    }
+
+    updateShippingInfo = ()=> {
+        return (req, res) => {
+            const run = async ()=> {
+                try{
+                    const { id } = req.user;
+                    
+                    const user = await this.User.findById(id);
+
+                    var theLocation = user.shipingInformations.find((location)=> location.id === req.params.id);
+                    theLocation = {...theLocation, ...req.body};
+                    var otherLocations = user.shipingInformations.filter((location)=> location.id !== req.params.id);
+                    otherLocations.push(theLocation);
+                    user.locations =  otherLocations;
+
+                    if (req.body.defaultLocation && req.body.defaultLocation === true ) {
+                        var newLocations = [];
+                        for (var l = 0; l < user.shipingInformations; l++) {
+                            let location = {...user.shipingInformations[l], defaultLocation: false};
+                            newLocations.push(location);
+                        }
+                        user.shipingInformations = newLocations;
+                    }
+
+                    await user.save();
+
+                    if (!user) {
+                        res.status(403).json({
+                            code: 403,
+                            status: false,
+                            message: 'Unable to update of create new location'
+                        });
+                        return;
+                    }
+
+                    res.status(200).json({
+                        code: 200,
+                        status: false,
+                        message: 'Updating of Products was successful',
+                        shipingInformations: user.shipingInformations
+                    });
+
+                    return;
+                } catch (err) {
+                    res.status(500).json({
+                        code: 403,
+                        status: false,
+                        message: err
+                    });
+                }
+            }
+        }
+    }
+
+    getShippingInfo = ()=> {
+        return (req, res) => {
+            const run = async ()=> {
+                try{
+                    const { id } = req.user;
+                    
+                    const user = await this.User.findById(id);
+
+                    if (!user) {
+                        res.status(403).json({
+                            code: 403,
+                            status: false,
+                            message: 'Unable to get of create new location'
+                        });
+                        return;
+                    }
+
+                    res.status(200).json({
+                        code: 200,
+                        status: false,
+                        message: 'Fetching of Products was successful',
+                        shipingInformations: user.shipingInformations
+                    });
+
+                    return;
+                } catch (err) {
+                    res.status(500).json({
+                        code: 403,
+                        status: false,
+                        message: err
+                    });
+                }
+            }
+        }
+    }
+
+    deleteShippingInfo = ()=> {
+        return (req, res) => {
+            const run = async ()=> {
+                try{
+                    const { id } = req.params;
+                    
+                    const user = await this.User.findByIdAndUpdate(req.user.id, {
+                        $push: {
+                            shipingInformations: { id }
+                        }
+                    });
+
+                    if (!user) {
+                        res.status(403).json({
+                            code: 403,
+                            status: false,
+                            message: 'Unable to update of create new location'
+                        });
+                        return;
+                    }
+
+                    res.status(200).json({
+                        code: 200,
+                        status: false,
+                        message: 'Updating of Products was successful',
+                        shipingInformations: user.shipingInformations
+                    });
+
+                    return;
+                } catch (err) {
+                    res.status(500).json({
+                        code: 403,
+                        status: false,
+                        message: err
+                    });
+                }
+            }
+        }
+    }
+
+    addPaymentCard = () => {
+        return (req, res) => {
+            const run = async () => {
+                const { id } = req.user
+                const {
+                    name,
+                    number,
+                    cvv,
+                    exp
+                } = req.body;
+
+                if ( !name || !number || !cvv || !exp ) {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "Please enter complete details name, number, cvv and exp",
+                    });
+                }
+
+                const newNumber = await this.jwt.sign({card: number}, USER_ACCESS_TOKEN_SECRET);
+
+                const user = await this.User.findById(id);
+                if (!user) {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "User not found",
+                    });
+                }
+                const updatedUser = await this.User.findByIdAndUpdate(id, {
+                    $push: {
+                        cardInfo: {
+                            name,
+                            number: newNumber,
+                            cvv,
+                            exp
+                        }
+                    }
+                });
+                if (updatedUser) {
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "User Card added successfully updated successfully",
+                        user: {...updatedUser._doc, password: undefined},
+                    });
+                } else {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "User Card update failed",
+                    });
+                }
+            }
+
+            run().catch((err) => {
+                return res.status(403).json({
+                    status: false,
+                    code: 403,
+                    message: "User Card update failed",
+                });
+            });
+        }
+    }
+
+    retrievePaymentCard = () => {
+        return (req, res) => {
+            const run = async () => {
+                const { id } = req.user
+
+                const user = await this.User.findById(id);
+                if (!user) {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "User not found",
+                    });
+                }
+
+                if (!user.cardInfo || user.cardInfo === []) {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "No available Card",
+                    });
+                }
+
+                const cards = []
+                user.cardInfo.map(async (card, index)=> {
+                    let decoded= await this.jwt.verify(card.number, USER_ACCESS_TOKEN_SECRET);
+                    cards.push({...card._doc, number: decoded.card}); 
+                    if ( index === (user.cardInfo.length -1) ){
+                        return res.status(200).json({
+                            status: true,
+                            code: 200,
+                            message: "User Card retrieved successfully",
+                            cards,
+                        });
+                    }
+                });
+            }
+
+            run().catch((err) => {
+                return res.status(403).json({
+                    status: false,
+                    code: 403,
+                    message: "User Card update failed",
+                });
+            });
+        }
+    }
+
+    updatePaymentCard = () => {
+        return (req, res) => {
+            const run = async () => {
+                const { id } = req.user
+
+                var info = req.body;
+
+                if (req.body.number) {
+                    info.number = await this.jwt.sign({card: req.body.number}, USER_ACCESS_TOKEN_SECRET);
+                }
+
+                const user = await this.User.findById(id);
+                if (!user) {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "User not found",
+                    });
+                }
+
+                user.cardInfo[info.cardId] = {...info};
+
+                const updatedUser = await user.save();
+
+                if (updatedUser) {
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "User Card updated successfully",
+                        user: {...updatedUser._doc, password: undefined},
+                    });
+                } else {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "User Card update failed",
+                    });
+                }
+            }
+
+            run().catch((err) => {
+                return res.status(403).json({
+                    status: false,
+                    code: 403,
+                    message: "User Card update failed",
+                });
+            });
+        }
+    }
+
+    removePaymentCard = () => {
+        return (req, res) => {
+            const run = async () => {
+                const { id } = req.user
+
+                const user = await this.User.findById(id);
+                if (!user) {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "User not found",
+                    });
+                }
+                const updatedUser = await this.User.findByIdAndUpdate(id, {
+                    $pull: {
+                        cardInfo: {
+                            id: req.body.cardId
+                        }
+                    }
+                });
+                if (updatedUser) {
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "User Card added successfully",
+                        user: {...updatedUser._doc, password: undefined},
+                    });
+                } else {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "User Card update failed",
+                    });
+                }
+            }
+
+            run().catch((err) => {
+                return res.status(403).json({
+                    status: false,
+                    code: 403,
+                    message: "User Card update failed",
+                });
+            });
+        }
+    }
+
+    addWithPaypal = () => {
+        return (req, res) => {
+            const run = async () => {
+                const { id } = req.user
+                const {
+                    email,
+                } = req.body;
+
+                const user = await this.User.findById(id);
+                if (!user) {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "User not found",
+                    });
+                }
+                const updatedUser = await this.User.findByIdAndUpdate(id, {
+                    $push: {
+                        paypal: {
+                            email,
+                        }
+                    }
+                });
+                if (updatedUser) {
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "User paypal details updated successfully",
+                        user: {...updatedUser._doc, password: undefined},
+                    });
+                } else {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "User paypal details update failed",
+                    });
+                }
+            }
+
+            run().catch((err) => {
+                return res.status(403).json({
+                    status: false,
+                    code: 403,
+                    message: "User paypal details update failed",
+                });
+            });
+        }
+    }
+
+    updateWithPaypal = () => {
+        return (req, res) => {
+            const run = async () => {
+                const { id } = req.user
+                var info = info = req.body;
+
+                const user = await this.User.findById(id);
+                if (!user) {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "User not found",
+                    });
+                }
+                user.paypal[info.paypalId] = {...info};
+
+                const updatedUser = await user.save();
+                if (updatedUser) {
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "User paypal details updated successfully",
+                        user: {...updatedUser._doc, password: undefined},
+                    });
+                } else {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "User paypal details update failed",
+                    });
+                }
+            }
+
+            run().catch((err) => {
+                return res.status(403).json({
+                    status: false,
+                    code: 403,
+                    message: "User paypal details update failed",
+                });
+            });
+        }
+    }
+
+    removeWithPaypal = () => {
+        return (req, res) => {
+            const run = async () => {
+                const { id } = req.user
+
+                const user = await this.User.findById(id);
+                if (!user) {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "User not found",
+                    });
+                }
+
+                const updatedUser = await this.User.findByIdAndUpdate(id, {
+                    $pull: {
+                        cardInfo: {
+                            id: req.body.paypalId
+                        }
+                    }
+                });
+
+                if (updatedUser) {
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "User paypal details updated successfully",
+                        user: {...updatedUser._doc, password: undefined},
+                    });
+                } else {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "User paypal details update failed",
+                    });
+                }
+            }
+
+            run().catch((err) => {
+                return res.status(403).json({
+                    status: false,
+                    code: 403,
+                    message: "User paypal details update failed",
+                });
+            });
+        }
+    }
+
+    addWithPayoneer = () => {
+        return (req, res) => {
+            const run = async () => {
+                const { id } = req.user
+                const {
+                    email,
+                } = req.body;
+
+                const user = await this.User.findById(id);
+                if (!user) {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "User not found",
+                    });
+                }
+                const updatedUser = await this.User.findByIdAndUpdate(id, {
+                    $push: {
+                        payoneer: {
+                            email,
+                        }
+                    }
+                });
+                if (updatedUser) {
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "User payoneer details updated successfully",
+                        user: {...updatedUser._doc, password: undefined},
+                    });
+                } else {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "User payoneer details update failed",
+                    });
+                }
+            }
+
+            run().catch((err) => {
+                return res.status(403).json({
+                    status: false,
+                    code: 403,
+                    message: "User payoneer details update failed",
+                });
+            });
+        }
+    }
+
+    updateWithPayoneer = () => {
+        return (req, res) => {
+            const run = async () => {
+                const { id } = req.user
+                var info = info = req.body;
+
+                const user = await this.User.findById(id);
+                if (!user) {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "User not found",
+                    });
+                }
+                user.payoneer[info.payoneerId] = {...info};
+
+                const updatedUser = await user.save();
+                if (updatedUser) {
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "User payoneer details updated successfully",
+                        user: {...updatedUser._doc, password: undefined},
+                    });
+                } else {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "User payoneer details update failed",
+                    });
+                }
+            }
+
+            run().catch((err) => {
+                return res.status(403).json({
+                    status: false,
+                    code: 403,
+                    message: "User payoneer details update failed",
+                });
+            });
+        }
+    }
+    
+    removeWithPayoneer = () => {
+        return (req, res) => {
+            const run = async () => {
+                const { id } = req.user
+
+                const user = await this.User.findById(id);
+                if (!user) {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "User not found",
+                    });
+                }
+
+                const updatedUser = await this.User.findByIdAndUpdate(id, {
+                    $pull: {
+                        payoneer: {
+                            id: req.body.payoneerId
+                        }
+                    }
+                });
+
+                if (updatedUser) {
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "User payoneer details updated successfully",
+                        user: {...updatedUser._doc, password: undefined},
+                    });
+                } else {
+                    return res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "User paypayoneer details update failed",
+                    });
+                }
+            }
+
+            run().catch((err) => {
+                return res.status(403).json({
+                    status: false,
+                    code: 403,
+                    message: "User paypal details update failed",
+                });
+            });
+        }
+    }
 
     generateVerificationCode = () => {
         return Math.floor(Math.random() * 1000000);

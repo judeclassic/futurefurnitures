@@ -9,6 +9,8 @@ const router = ({ Router, VendorController, Authenticate, Vendor, User, service,
     router.post('/signUp', userWithLisenceUploader, vendorController.signUpVendor());
 
     router.post('/login', vendorController.loginVendor());
+
+    router.get('/detail/:id', vendorController.getVendorDetailsWithOutAuth());
     
     router.post('/updateJobInfo', verifyUserToken(), vendorController.updateJobInfo());
 
@@ -81,7 +83,7 @@ const router = ({ Router, VendorController, Authenticate, Vendor, User, service,
 
     router.get('/all', vendorController.getVendors());
 
-    router.get('/profile/:id', vendorController.getVendor());
+    router.get('/profile', verifyUserToken(), vendorController.getVendor());
 
     router.put('/profile', verifyUserToken(), vendorController.updateVendor());
 

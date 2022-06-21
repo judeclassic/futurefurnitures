@@ -2,6 +2,8 @@ import mongoose from "mongoose";
 
 //User Schema
 
+///DO NOT USE
+
 const Seller= mongoose.model("Seller", mongoose.Schema({
   name: {
     type: String,
@@ -44,6 +46,10 @@ const Seller= mongoose.model("Seller", mongoose.Schema({
     type: String,
   },
   cart: [{
+    type: mongoose.Schema.ObjectId,
+    ref: "Product",
+  }],
+  savedProducts: [{
     type: mongoose.Schema.ObjectId,
     ref: "Product",
   }],
