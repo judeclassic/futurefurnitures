@@ -135,15 +135,67 @@ export default class ProductController {
             return run();
         }
     }
+
     getSellerProduct() {
         return (req, res) => {
             const run = async () => {
                 try{
                     const { sellerId } = req.params;
-                    const products = await this.Product.findById(sellerId);
+                    if (!sellerId) {
+                        return res.status(500).json({
+                            status: false,
+                            code: 403,
+                            message: "sellerId is empty",
+                        });
+                    }
+                    const products = await this.Product.find({seller: sellerId});
+                    if (!products || products._doc == []) {
+                        return res.status(201).json({
+                            status: false,
+                            code: 201,
+                            message: "seller has no products yet",
+                        });
+                    }
                     return res.status(200).json({
                         status: true,
                         code: 200,
+                        message: 'Fetched products successfully',
+                        products,
+                    });
+                }
+                catch (error) {
+                    // console.log(error);
+                    return res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: error.message,
+                    });
+                }
+            }
+            
+            return run();
+        }
+    }
+
+    getSingleProduct() {
+        return (req, res) => {
+            const run = async () => {
+                try{
+                    const { id } = req.params;
+                    console.log('hahahaahah')
+                    const products = await this.Product.findById(id);
+                    if (!products) {
+                        return res.status(200).json({
+                            status: false,
+                            code: 200,
+                            message: 'Product not found',
+                            products,
+                        });
+                    }
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: 'Products fetched successfully',
                         products,
                     });
                 }

@@ -540,7 +540,7 @@ export default class SellerController extends ProductController {
                             status: true,
                             code: 200,
                             message: "Seller data loaded successfully",
-                            loadAllSellers: data,
+                            sellers: data,
                         });
                     } else {
                         console.log(err);
