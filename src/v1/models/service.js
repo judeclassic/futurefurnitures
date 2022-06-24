@@ -19,11 +19,11 @@ const resquest = mongoose.model("service", {
         type: mongoose.Schema.Types.ObjectId,
         ref: "vendor",
     },
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user",
+    },
     user: {
-        id: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "user",
-        },
         name: {
             type: String
         },
