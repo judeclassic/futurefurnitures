@@ -851,7 +851,7 @@ export default class UserController {
         return (req, res) => {
             try {
                 this.User.findById(req.user.id, (err, data) => {
-                    if (!err) {
+                    if (!err && data) {
                         if (data.cart === undefined || data.cart.length === 0) {
                             return res.status(200).json({
                                 status: true,
@@ -888,9 +888,9 @@ export default class UserController {
                         return final();
                     } else {
                         console.log(err);
-                        res.status(500).json({
+                        res.status(403).json({
                             status: false,
-                            code: 500,
+                            code: 403,
                             message: "Cart data not loaded",
                         });
                     }
@@ -898,9 +898,9 @@ export default class UserController {
 
             } catch (err) {
                 console.log(err);
-                res.status(500).json({
+                res.status(403).json({
                     status: false,
-                    code: 500,
+                    code: 403,
                     message: "Cart data not loaded",
                 });
             }
