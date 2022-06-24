@@ -93,7 +93,7 @@ const router = ({ Router, VendorController, Authenticate, Vendor, User, service,
 
     router.post('/requestVendorService', verifyUserToken(), vendorController.requestVendorService());
 
-    router.get('/viewVendorServiceRequests/:id', verifyUserToken(), vendorController.viewAllRequests());
+    router.get('/viewUserServiceRequests/:id', verifyUserToken(), vendorController.viewAllRequests());
 
     router.post('/pay', verifyUserToken(), vendorController.payVendor());
     

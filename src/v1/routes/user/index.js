@@ -1,10 +1,10 @@
 //@ts-check
 
-const router = ({ Router, UserController, Seller, SellerProduct, Authenticate, EmailHandler, bcrypt, jwt, userUploader, Product }) => {
+const router = ({ Router, UserController, User, SellerProduct, Authenticate, EmailHandler, bcrypt, jwt, userUploader, Product }) => {
     const router = Router();
 
-    const userController = new UserController({ User: Seller, EmailHandler, UserProduct: SellerProduct, Product, bcrypt, jwt });
-    const { verifyUserToken } = new Authenticate({ User: Seller, bcrypt, jwt });
+    const userController = new UserController({ User, EmailHandler, UserProduct: SellerProduct, Product, bcrypt, jwt });
+    const { verifyUserToken } = new Authenticate({ User, bcrypt, jwt });
 
     // User Login
     router.post("/signIn", userController.loginUser() );

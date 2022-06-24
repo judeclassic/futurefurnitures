@@ -33,6 +33,23 @@ const User= mongoose.model("User", mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  location: {
+    address: { 
+      type: String
+    },
+    city: { 
+      type: String
+    },
+    state: { 
+      type: String
+    },
+    country: { 
+      type: String
+    },
+    postalCode: { 
+      type: String
+    },
+  },
   isDeleted: {
     type: Boolean,
     default: false,
@@ -80,7 +97,7 @@ const User= mongoose.model("User", mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     ref: "Comment",
   }],
-  shipingInformations: [{
+  shippingInformations: [{
     firstName: { 
       type: String
     },

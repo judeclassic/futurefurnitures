@@ -20,7 +20,6 @@ export default class UserController {
     registerUser = () => {  
         return (req, res) => {
             try{
-                console.log("BODY", req.body);
                 let hashPassword = this.bcrypt.hashSync(req.body.password, 10);
                 let code = this.generateVerificationCode();
                 if (!req.body) {
@@ -55,6 +54,8 @@ export default class UserController {
                                         isVerified: false,
                                         isAdmin: false,
                                         isActive: true,
+                                        status: 'active',
+                                        role: 'user',
                                         isDeleted: false,
                                         createDate: new Date(),
                                         updateDate: new Date(),
@@ -773,6 +774,41 @@ export default class UserController {
         }
     }
 
+    increaseProductQuantityInCart = () => {
+        return (req, res) => {
+            try {
+                this.User.findByIdAndUpdate(req.user.id, {
+                    $push: {
+                        cart: req.params.productId,
+                    },
+                }, (err, data) => {
+                    if (!err) {
+                        res.status(200).json({
+                            status: true,
+                            code: 200,
+                            message: "Product added to cart successfully",
+                            user: data,
+                        });
+                    } else {
+                        console.log(err);
+                        res.status(500).json({
+                            status: false,
+                            code: 500,
+                            message: "Product not added to cart",
+                        });
+                    }
+                });
+            } catch (err) {
+                console.log(err);
+                res.status(500).json({
+                    status: false,
+                    code: 500,
+                    message: "Product not added to cart",
+                });
+            }
+        }
+    }
+
     // Remove Product from Cart
     removeProductFromCart = () => {
         return (req, res) => {
@@ -1012,6 +1048,7 @@ export default class UserController {
             const run = async () => {
                 try{
                     const { id } = req.user;
+                    console.log(id);
                     const { firstName, lastName, email, phone, address, city, state, country, postalCode, defaultLocation } = req.body;
                     if (!address || !city || !state || !country || !postalCode) {
                         res.status(403).json({
@@ -1021,31 +1058,32 @@ export default class UserController {
                         });
                         return;
                     }
-                    console.log(defaultLocation);
+                    const user = await this.User.findById(id);
                     if (defaultLocation) {
-                        const user = await this.User.findById(id);
                         var newLocations = [];
-                        for (var l = 0; l < user.shipingInformations; l++) {
-                            let location = {...user.shipingInformations[l], defaultLocation: false};
-                            newLocations.push(location);
+                        for (var l = 0; l < user.shippingInformations; l++) {
+                            let location = {...user.shippingInformations[l], defaultLocation: false};
+                            user.shippingInformations.push(location);
                         }
-                        user.shipingInformations = newLocations;
                         await user.save();
                     }
 
-                    const user = await this.User.findByIdAndUpdate(id, {
-                        $push: {
-                            shipingInformations: { firstName, lastName, email, phone, address, city, state, country, postalCode, defaultLocation }
-                        }
-                    });
+                    // const user = await this.User.findByIdAndUpdate(id, {
+                    //     $push: {
+                    //         shippingInformations: { firstName, lastName, email, phone, address, city, state, country, postalCode, defaultLocation }
+                    //     }
+                    // });
+                    user.shippingInformations.push({ firstName, lastName, email, phone, address, city, state, country, postalCode, defaultLocation });
 
-                    console.log('location', user.shipingInformations)
+                    await user.save();
+
+                    console.log('Shipping Informations', user.shippingInformations)
 
                     if (!user) {
                         res.status(403).json({
                             code: 403,
                             status: false,
-                            message: 'Unable to update of create new location'
+                            message: 'Unable to update of create new shipping Informations'
                         });
                         return;
                     }
@@ -1053,12 +1091,13 @@ export default class UserController {
                     res.status(200).json({
                         code: 200,
                         status: true,
-                        message: 'Adding of location was successful',
-                        shipingInformations: user.shipingInformations || []
+                        message: 'Adding of shipping Informations was successful',
+                        shippingInformations: user.shippingInformations || []
                     });
 
                     return;
                 } catch (err) {
+                    console.log(err);
                     res.status(500).json({
                         code: 403,
                         status: false,
@@ -1079,19 +1118,19 @@ export default class UserController {
                     
                     const user = await this.User.findById(id);
 
-                    var theLocation = user.shipingInformations.find((location)=> location.id === req.params.id);
+                    var theLocation = user.shippingInformations.find((location)=> location.id === req.params.id);
                     theLocation = {...theLocation, ...req.body};
-                    var otherLocations = user.shipingInformations.filter((location)=> location.id !== req.params.id);
+                    var otherLocations = user.shippingInformations.filter((location)=> location.id !== req.params.id);
                     otherLocations.push(theLocation);
                     user.locations =  otherLocations;
 
                     if (req.body.defaultLocation && req.body.defaultLocation === true ) {
                         var newLocations = [];
-                        for (var l = 0; l < user.shipingInformations; l++) {
-                            let location = {...user.shipingInformations[l], defaultLocation: false};
+                        for (var l = 0; l < user.shippingInformations; l++) {
+                            let location = {...user.shippingInformations[l], defaultLocation: false};
                             newLocations.push(location);
                         }
-                        user.shipingInformations = newLocations;
+                        user.shippingInformations = newLocations;
                     }
 
                     await user.save();
@@ -1109,7 +1148,7 @@ export default class UserController {
                         code: 200,
                         status: false,
                         message: 'Updating of Products was successful',
-                        shipingInformations: user.shipingInformations
+                        shippingInformations: user.shippingInformations
                     });
 
                     return;
@@ -1145,7 +1184,7 @@ export default class UserController {
                         code: 200,
                         status: false,
                         message: 'Fetching of Products was successful',
-                        shipingInformations: user.shipingInformations
+                        shippingInformations: user.shippingInformations
                     });
 
                     return;
@@ -1168,7 +1207,7 @@ export default class UserController {
                     
                     const user = await this.User.findByIdAndUpdate(req.user.id, {
                         $push: {
-                            shipingInformations: { id }
+                            shippingInformations: { id }
                         }
                     });
 
@@ -1185,7 +1224,7 @@ export default class UserController {
                         code: 200,
                         status: false,
                         message: 'Updating of Products was successful',
-                        shipingInformations: user.shipingInformations
+                        shippingInformations: user.shippingInformations
                     });
 
                     return;

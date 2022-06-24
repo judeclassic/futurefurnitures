@@ -1,33 +1,47 @@
 import mongoose from "mongoose";
 
 const resquest = mongoose.model("service", {
-    name: {
-        type: String,
-        required: true
+    category: {
+        type: String
     },
-    email: {
+    status: {
         type: String,
-        required: true
     },
-    state: {
+    photos: {
         type: String,
-        required: true
     },
     payment: {
-        type: String,
-        required: true
+        price: {
+            type: String
+        },
     },
     vendor: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "vendor",
-        required: true
     },
     user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "user",
-        required: true
+        id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "user",
+        },
+        name: {
+            type: String
+        },
+        email: {
+            type: String,
+            required: true
+        },
     },
     discription: {
+        type: String,
+    },
+    address: {
+        type: String
+    },
+    date: {
+        type: String,
+    },
+    time: {
         type: String,
     },
     createdAt: {

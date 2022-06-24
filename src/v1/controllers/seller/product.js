@@ -63,6 +63,7 @@ export default class ProductController {
                     });
 
                     await products.save();
+                    this.Seller.findByIdAndUpdate({role: 'seller'});
                     return res.status(200).json({
                         status: true,
                         code: 200,

@@ -1,16 +1,18 @@
 //@ts-check
 
-const router = ({ Router, SellerController, Seller, SellerProduct, Authenticate, EmailHandler, bcrypt, jwt, productUploader, userUploader}) => {
+const router = ({ Router, SellerController, User, SellerProduct, Authenticate, EmailHandler, bcrypt, jwt, productUploader, userUploader}) => {
     const router = Router();
 
-    const sellerController = new SellerController({ Seller, EmailHandler, SellerProduct, bcrypt, jwt, });
-    const { clickVerification, verifySellerToken } = new Authenticate({ Seller, bcrypt, jwt });
+    const sellerController = new SellerController({ Seller: User, EmailHandler, SellerProduct, bcrypt, jwt, });
+    const { clickVerification, verifySellerToken } = new Authenticate({ Seller: User, bcrypt, jwt });
 
     // Seller Login
     router.post( "/signIn", sellerController.loginSeller() );
 
     // Seller Signup
     router.post("/signUp", sellerController.registerSeller() );
+
+    router.get( "/details/:id", sellerController.getSellerProfile() );
 
     // Seller Profile
     router.get( "/profile/:id", verifySellerToken(), sellerController.getSellerProfile() );
@@ -41,6 +43,7 @@ const router = ({ Router, SellerController, Seller, SellerProduct, Authenticate,
 
     // Load All Sellers
     router.get( "/all", sellerController.loadAllSellers() );
+    
 
     // Get Single Seller Data
     // router.get(
