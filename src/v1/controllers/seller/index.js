@@ -6,8 +6,8 @@ const USER_ACCESS_TOKEN_SECRET = process.env.USER_ACCESS_TOKEN_SECRET || 'rirriu
 
 export default class SellerController extends ProductController {
 
-    constructor({ Seller, EmailHandler, SellerProduct, bcrypt, jwt }) {
-        super({ Product: SellerProduct, Seller, EmailHandler });
+    constructor({ Seller, EmailHandler, SellerProduct, Order, bcrypt, jwt }) {
+        super({ Product: SellerProduct, Order, Seller, EmailHandler });
         this.Seller = Seller;
         this.EmailHandler = EmailHandler;
         this.bcrypt = bcrypt;

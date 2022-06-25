@@ -1,9 +1,9 @@
 //@ts-check
 
-const router = ({ Router, SellerController, User, SellerProduct, Authenticate, EmailHandler, bcrypt, jwt, productUploader, userUploader}) => {
+const router = ({ Router, SellerController, User, SellerProduct, Order, Authenticate, EmailHandler, bcrypt, jwt, productUploader, userUploader}) => {
     const router = Router();
 
-    const sellerController = new SellerController({ Seller: User, EmailHandler, SellerProduct, bcrypt, jwt, });
+    const sellerController = new SellerController({ Seller: User, EmailHandler, SellerProduct, Order, bcrypt, jwt, });
     const { clickVerification, verifySellerToken } = new Authenticate({ Seller: User, bcrypt, jwt });
 
     // Seller Login
@@ -83,17 +83,8 @@ const router = ({ Router, SellerController, User, SellerProduct, Authenticate, E
     // Delete Product
     router.delete( "/product/:id", verifySellerToken(), sellerController.deleteSellerProduct() );
 
-    // Mark Product as Sold
-    router.put( "/product/sold/:id", verifySellerToken(), sellerController.markProductAsSold() );
 
-    // Get Seller Sold Products
-    router.get( "/products/sold/:sellerId", verifySellerToken(), sellerController.getSellerSoldProducts() );
-
-    // Get Seller Ordered Products
-    router.get( "/products/ordered/:sellerId", verifySellerToken(), sellerController.getSellerOrderedProducts() );
-
-    // Get Seller Pending Products
-    router.get( "/products/pending/:sellerId", verifySellerToken(), sellerController.getSellerPendingProducts() );
+    // LISTINGS
 
     // Save Product As Active
     router.put( '/product/saveasactive/:id', verifySellerToken(), sellerController.saveProductAsActive() );
@@ -105,8 +96,37 @@ const router = ({ Router, SellerController, User, SellerProduct, Authenticate, E
     router.put( "/product/saveasdraft/:id", verifySellerToken(), sellerController.saveProductAsDraft() );
 
     // Get Seller Drafted Products
-    router.get( "/products/drafted/:sellerId", verifySellerToken(), sellerController.getSellerDraftedProducts()
-    );
+    router.get( "/products/drafted/:sellerId", verifySellerToken(), sellerController.getSellerDraftedProducts() );
+
+    // Save Product As Closed
+    router.put( "/product/saveasclosed/:id", verifySellerToken(), sellerController.saveProductAsClosed() );
+
+    // Get Seller Drafted Products
+    router.get( "/products/closed/:sellerId", verifySellerToken(), sellerController.getSellerClosedProducts() );
+
+    // FOR ORDERS
+
+    // Order Product 
+    router.post( "/order/product", verifySellerToken(), sellerController.createOrder() );
+
+
+    // Mark Product as Pending
+    router.put( "/order/pending/:id", verifySellerToken(), sellerController.markOrderAsPending() );
+
+    // Get Seller Pending Products
+    router.get( "/order/pending/:sellerId", verifySellerToken(), sellerController.getSellerPendingOrders() );
+
+    // Mark Product as Expected
+    router.put( "/order/expected/:id", verifySellerToken(), sellerController.markOrderAsExpected() );
+
+    // Get Seller Expected Products
+    router.get( "/order/expected/:sellerId", verifySellerToken(), sellerController.getSellerExpectedOrders() );
+
+    // Mark Product as Available
+    router.put( "/order/available/:id", verifySellerToken(), sellerController.markOrderAsAvailable() );
+
+    // Get Seller Available Products
+    router.get( "/order/available/:sellerId", verifySellerToken(), sellerController.getSellerAvailableOrders() );
 
     // FOR BUYERS
 
@@ -118,22 +138,6 @@ const router = ({ Router, SellerController, User, SellerProduct, Authenticate, E
 
     // View Saved Product For Buyers
     router.get( "/products/saved/:id", verifySellerToken(), sellerController.getSavedProducts() );
-
-    
-
-    // Get Transaction By SellerId
-    // router.get(
-    //     "/transactions/:sellerId/:id",
-    //     verifySellerToken(),
-    //     sellerController.getTransactionsBySellerId()
-    // );
-
-    // // Get Transaction By SellerId
-    // router.get(
-    //     "/transactions/:sellerId",
-    //     verifySellerToken(),
-    //     sellerController.getTransactionsBySellerId()
-    // );
 
 
     return router;

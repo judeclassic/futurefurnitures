@@ -6,9 +6,22 @@ const OrderModel = mongoose.model('Order' , mongoose.Schema({
         ref: 'User',
         required: true,
     },
+    sellerId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true,
+    },
     productId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Product',
+        required: true,
+    },
+    type: {
+        type: String,
+        required: true
+    },
+    status: {
+        type: String,
         required: true,
     },
     quantity: {

@@ -1,8 +1,10 @@
 //@ts-check
+import OrderController from "./order";
 import Transaction from "./finance";
 
-export default class ProductController {
-    constructor({ Product, Seller, EmailHandler}) {
+export default class ProductController extends OrderController {
+    constructor({ Product, Order, Seller, EmailHandler}) {
+        super({ Product, Order, Seller, EmailHandler})
         this.Product = Product;
         this.EmailHandler = EmailHandler;
         this.Seller = Seller;
@@ -301,6 +303,10 @@ export default class ProductController {
         }
     }
 
+    //LISTING
+
+
+
     markProductAsSold = () => {
         return (req, res) => {
             const run = async () => {
@@ -493,6 +499,64 @@ export default class ProductController {
                     });
                 }
                 catch (error) {
+                    return res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: "Internal Server Error",
+                    });
+                }
+            }
+
+            return run();
+        }
+    }
+
+    saveProductAsClosed = () => {
+        return (req, res) => {
+            const run = async () => {
+                try {
+                    const { id } = req.params;
+                    const products = await this.Product.findByIdAndUpdate(id, { status: 'closed' }, { new: true });
+                    if (!products) {
+                        return res.status(200).json({
+                            status: false,
+                            message: "Product do not exist or have already been deleted",
+                            code: 201,
+                        });
+                    }
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "Product updated successfully",
+                        products,
+                    });
+                }
+                catch {
+                    return res.status(200).json({
+                        status: true,
+                        message: "Unable to update Product",
+                        code: 500,
+                    });
+                }
+            }
+
+            return run();
+        }
+    }
+
+    getSellerClosedProducts = () => {
+        return (req, res) => {
+            const run = async () => {
+                try {
+                    const { sellerId } = req.params;
+                    const products = await this.Product.find({ seller: sellerId, status: 'closed' });
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "Products fetched successfully",
+                        products
+                    });
+                } catch (error) {
                     return res.status(500).json({
                         status: false,
                         code: 500,

@@ -68,7 +68,7 @@ export const theHouseInteriorApp = function ({app, server}) {
     app.use('/v1/api/order', orderRouter({ Router, OrderController, Authenticate, Order, User, Product, EmailHandler, messages, bcrypt, jwt }));
     app.use('/v1/api/payment', paymentRouter({ Router, PaymentController, Authenticate, Product, User, EmailHandler, PaymentHandler, messages, bcrypt, jwt }));
 
-    app.use('/v1/api/seller', sellerRouter({ Router, SellerController, User, SellerProduct, Authenticate, EmailHandler, bcrypt, jwt, productUploader, userUploader }));
+    app.use('/v1/api/seller', sellerRouter({ Router, SellerController, User, SellerProduct, Order, Authenticate, EmailHandler, bcrypt, jwt, productUploader, userUploader }));
 
 
     /*
