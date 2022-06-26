@@ -741,36 +741,73 @@ export default class UserController {
     // Save Product in Cart 
     saveProductInCart = () => {
         return (req, res) => {
-            try {
-                this.User.findByIdAndUpdate(req.user.id, {
-                    $push: {
-                        cart: req.params.productId,
-                    },
-                }, (err, data) => {
-                    if (!err) {
-                        res.status(200).json({
-                            status: true,
-                            code: 200,
-                            message: "Product added to cart successfully",
-                            user: data,
-                        });
-                    } else {
-                        console.log(err);
-                        res.status(500).json({
+            const run = async () => {
+                try {
+                    const { productId, quantity, color } = req.body;
+                    const user = await this.User.findById(req.user.id);
+                    if (!user) {
+                        res.status(403).json({
                             status: false,
-                            code: 500,
-                            message: "Product not added to cart",
+                            code: 403,
+                            message: "User not found",
                         });
                     }
-                });
-            } catch (err) {
-                console.log(err);
-                res.status(500).json({
-                    status: false,
-                    code: 500,
-                    message: "Product not added to cart",
-                });
+
+                    for (var i = 0; i < user.cart.length; i++ ) {
+                        if ( user.cart[i].productId.toString() === productId && user.cart[i].color === color) {
+                            user.cart[i] = {
+                                productId: user.cart[i].productId,
+                                color: user.cart[i].color,
+                                quantity: (parseInt(user._doc.cart[i].quantity) + parseInt(quantity))
+                            };
+                            await user.save();
+                            res.status(200).json({
+                                status: true,
+                                code: 200,
+                                message: "Product update at cart successfully",
+                                cart: user.cart,
+                            });
+                            return;
+                        }
+                    }
+
+                    this.User.findByIdAndUpdate(req.user.id, {
+                        $push: {
+                            cart: { 
+                                productId,
+                                color,
+                                quantity
+                            }
+                        },
+                    }, (err, data) => {
+                        if (!err) {
+                            res.status(200).json({
+                                status: true,
+                                code: 200,
+                                message: "Product added to cart successfully",
+                                cart: data.cart,
+                            });
+                        } else {
+                            console.log(err);
+                            res.status(403).json({
+                                status: false,
+                                code: 403,
+                                message: "Product not added to cart",
+                            });
+                        }
+                    });
+
+                } catch (err) {
+                    console.log(err);
+                    res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: "Product not added to cart",
+                    });
+                }
             }
+
+            return run();
         }
     }
 
@@ -860,14 +897,23 @@ export default class UserController {
                                 cart: [],
                             });
                         }
-                        console.log(data.cart);
 
                         const final = async () => {
                             var cart = [];
                             var numb = 0;
 
                             await data.cart.map(async (item) => {
-                                var product = await this.Product.findById(item);
+                                var product = await this.Product.findById(item.productId);
+                                console.log(product);
+                                var variant = product.variants.find((v)=> v.color === item.color)
+                                product = { 
+                                    ...product._doc,
+                                    quantity: item.quantity,
+                                    color: item.color,
+                                    variants: undefined,
+                                    variant,
+                                    price: variant.price
+                                }
                                 numb = numb + 1;
 
                                 if (product){

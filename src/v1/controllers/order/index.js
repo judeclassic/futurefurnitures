@@ -1,64 +1,72 @@
 //@ts-check
+// import Transaction from "./finance";
 
 export default class OrderController {
-
-    constructor({Order, User, Product, EmailHandler, bcrypt, jwt}) {
-        this.Order = Order;
-        this.User = User;
+    constructor({ Product, Order, User, EmailHandler}) {
         this.Product = Product;
+        this.Order = Order;
         this.EmailHandler = EmailHandler;
-        this.bcrypt = bcrypt;
-        this.jwt = jwt;
+        this.User = User;
+        // this.Transaction = new Transaction({
+        //     Transaction,
+        //     EmailHandler,
+        // });
     }
-    
-    orderProduct = () => {
+
+    createOrder = () => {
         return (req, res) => {
-            console.log(req.body)
             const run = async () => {
-                try {
-                    const product = await this.Product.findById(req.body.productId);
-                    if (!product) {
-                        return res.status(403).json({
-                            status: false,
-                            code: 403,
-                            message: "Product not found",
-                        });
-                    }
-                    if (product.quantity < req.body.quantity) {
-                        return res.status(403).json({
-                            status: false,
-                            code: 403,
-                            message: "Insuffiency Products",
-                        });
-                    }
-                    else {
-                        const order = new this.Order({
-                            userId: req.body.userId,
-                            productId: req.body.productId,
-                            quantity: req.body.quantity,
-                            price: product.price,
-                            totalPrice: req.body.quantity * product.price,
-                            isDeleted: false,
-                        });
-                        const newOrder = await order.save();
+                try{
+                    const { userId, quantity, productId, shippingInfo } = req.body;
+                    const {
+                        firstName,
+                        lastName,
+                        email,
+                        phone,
+                        address,
+                        city,
+                        state,
+                        country,
+                        postalCode,
+                    } = shippingInfo;
+                    const product = await this.Product.findById(productId);
+                    console.log(product)
 
-                        this.User.findByIdAndUpdate(req.body.userId, { $push: { orderedProducts: req.body.productId }});
+                    const products = new this.Order({
+                        userId,
+                        sellerId: product.user.trim(),
+                        productId,
+                        type: 'new item',
+                        status: 'expected',
+                        quantity,
+                        price: product.price,
+                        totalPrice: parseInt(product.price) * parseInt(quantity),
+                        isDeleted: false,
+                        shipping: {
+                            firstName,
+                            lastName,
+                            email,
+                            phone,
+                            address,
+                            city,
+                            state,
+                            country,
+                            postalCode,
+                        },
+                    });
 
-                        return res.status(200).json({
-                            status: true,
-                            code: 200,
-                            message: "Order placed successfully",
-                            order: newOrder,
-                        });
-                    }
-                }
-                catch (error) {
-                    console.log(error)
-                    res.status(500).json({
+                    await products.save();
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        products,
+                    });
+                } catch (error) {
+                    // console.log(error);
+                    return res.status(500).json({
                         status: false,
                         code: 403,
-                        message: "Internal server error",
-                        error,
+                        message: error.message,
                     });
                 }
             }
@@ -67,186 +75,343 @@ export default class OrderController {
         }
     }
 
-    getAllOrders= () => {
+    getAllOrders = () => {
         return (req, res) => {
             const run = async () => {
-                try {
-                    const orders = await this.Order.find({ isDeleted: false });
-                    res.status(200).json({
-                        code: 200,
-                        message: "Orders fetched successfully",
-                        orders,
+                try{
+                    const products = await this.Order.find({
+                        isDeleted: false,
+                        isActive: true,
+                        type: 'new item'
                     });
-                } catch (error) {
-                    res.status(500).json({
-                        code: 500,
-                        message: "Internal server error",
-                        error,
-                    });
-                }
-            }
-
-            run();
-        }
-    }
-
-    getOrderById= () => {
-        return (req, res) => {
-            const run = async () => {
-                try {
-                    const order = await this.Order.findById(req.params.id);
-                    res.status(200).json({
+                    return res.status(200).json({
                         status: true,
                         code: 200,
-                        message: "Order fetched successfully",
-                        order,
+                        products,
                     });
-                } catch (error) {
-                    res.status(500).json({
+                }
+                catch (error) {
+                    // console.log(error);
+                    return res.status(500).json({
                         status: false,
                         code: 500,
-                        message: "Internal server error",
-                        error,
+                        message: error.message,
                     });
                 }
             }
 
-            run();
+            return run();
         }
     }
 
-    getOrdersByUserId = () => {
+    getUserOrder() {
+        return (req, res) => {
+            const run = async () => {
+                try{
+                    const { userId } = req.params;
+                    if (!userId) {
+                        return res.status(500).json({
+                            status: false,
+                            code: 403,
+                            message: "userId is empty",
+                        });
+                    }
+                    const products = await this.Order.find({user: userId, type: 'new item',});
+                    if (!products || products._doc == []) {
+                        return res.status(201).json({
+                            status: false,
+                            code: 201,
+                            message: "user has no products yet",
+                        });
+                    }
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: 'Fetched products successfully',
+                        products,
+                    });
+                }
+                catch (error) {
+                    // console.log(error);
+                    return res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: error.message,
+                    });
+                }
+            }
+            
+            return run();
+        }
+    }
+
+    getSingleOrder() {
+        return (req, res) => {
+            const run = async () => {
+                try{
+                    const { id } = req.params;
+                    console.log('hahahaahah')
+                    const products = await this.Order.findOne({id, type: 'new item',});
+                    if (!products) {
+                        return res.status(200).json({
+                            status: false,
+                            code: 200,
+                            message: 'Order not found',
+                            products,
+                        });
+                    }
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: 'Orders fetched successfully',
+                        products,
+                    });
+                }
+                catch (error) {
+                    // console.log(error);
+                    return res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: error.message,
+                    });
+                }
+            }
+            
+            return run();
+        }
+    }
+
+    updateUserOrder = () => {
+        return (req, res) => {
+            const run = async () => {
+                try{
+                    const { id } = req.params;
+                    
+                    const orders = await this.Order.findOneAndUpdate({id, type: 'new item',}, req.body, { new: true });
+                    this.EmailHandler.sendUserEmail({orders});
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: 'Order updated successfully',
+                        order: orders,
+                    });
+                } catch (error) {
+                    return res.status(500).json({
+                        status: false,
+                        code: 500,
+                        message: error,
+                    });
+                }
+            }
+
+            return run();
+        }
+    }
+
+    deleteUserOrder = () => {
         return (req, res) => {
             const run = async () => {
                 try {
-                    const orders = await this.Order.find({
-                        userId: req.params.userId,
-                        isDeleted: false,
+                    const { id } = req.params;
+                    const products = await this.Order.findOneAndDelete({id, type: 'new item',});
+                    if (!products) {
+                        return res.status(200).json({
+                            status: false,
+                            message: "Order do not exist or have already been deleted",
+                            code: 201,
+                        });
+                    }
+                    this.EmailHandler.sendUserEmail({products});
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "Order deleted successfully",
+                        products,
                     });
-                    res.status(200).json({
+                } catch {
+                    return res.status(200).json({
+                        status: true,
+                        message: "Unable to delete Order",
+                        code: 500,
+                    });
+                }
+            }
+
+            return run();
+        }
+    }
+    
+    markOrderAsExpected = () => {
+        return (req, res) => {
+            const run = async () => {
+                try {
+                    const { id } = req.params;
+                    const products = await this.Order.findOneAndUpdate({ id, type: 'new item' }, { status: 'expected' }, { new: true });
+                    if (!products) {
+                        return res.status(200).json({
+                            status: false,
+                            message: "Order do not exist or have already been deleted",
+                            code: 201,
+                        });
+                    }
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "Order updated successfully",
+                        products,
+                    });
+                }
+                catch {
+                    return res.status(200).json({
+                        status: true,
+                        message: "Unable to update Order",
+                        code: 500,
+                    });
+                }
+            }
+
+            return run();
+        }
+    }
+
+    getUserExpectedOrders = () => {
+        return (req, res) => {
+            const run = async () => {
+                try {
+                    const { userId } = req.params;
+                    const products = await this.Order.find({ user: userId, status: 'expected', type: 'new item' });
+                    return res.status(200).json({
                         status: true,
                         code: 200,
                         message: "Orders fetched successfully",
-                        orders,
+                        products
                     });
-                }
-                catch (error) {
-                    res.status(500).json({
+                } catch (error) {
+                    return res.status(500).json({
                         status: false,
                         code: 500,
-                        message: "Internal server error",
-                        error,
+                        message: "Internal Server Error",
                     });
                 }
             }
 
-            run();
+            return run();
         }
     }
 
-    getOrdersByProductId= () => {
+    markOrderAsPending = () => {
         return (req, res) => {
             const run = async () => {
                 try {
-                    const orders = await this.Order.find({
-                        productId: req.params.productId,
-                        isDeleted: false,
+                    const { id } = req.params;
+                    const products = await this.Order.findOneAndUpdate({ id, type: 'new item' }, { status: 'pending' }, { new: true });
+                    if (!products) {
+                        return res.status(200).json({
+                            status: false,
+                            message: "Order do not exist or have already been deleted",
+                            code: 201,
+                        });
+                    }
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "Order updated successfully",
+                        products,
                     });
-                    res.status(200).json({
-                        stutus: true,
+                }
+                catch {
+                    return res.status(200).json({
+                        status: true,
+                        message: "Unable to update Order",
+                        code: 500,
+                    });
+                }
+            }
+
+            return run();
+        }
+    }
+
+    getUserPendingOrders = () => {
+        return (req, res) => {
+            const run = async () => {
+                try {
+                    const { userId } = req.params;
+                    const products = await this.Order.find({ user: userId, status: 'pending', type: 'new item' });
+                    return res.status(200).json({
+                        status: true,
                         code: 200,
                         message: "Orders fetched successfully",
-                        orders,
+                        products
                     });
-                }
-                catch (error) {
-                    res.status(500).json({
+                } catch (error) {
+                    return res.status(500).json({
                         status: false,
                         code: 500,
-                        message: "Internal server error",
-                        error,
+                        message: "Internal Server Error",
                     });
                 }
             }
 
-            run();
+            return run();
         }
     }
 
-    updateOrder= () => {
-
+    markOrderAsAvailable = () => {
         return (req, res) => {
             const run = async () => {
                 try {
-                    const order = await this.Order.findById(req.params.orderId);
-                    if (!order) {
-                        res.status(404).json({
+                    const { id } = req.params;
+                    const products = await this.Order.findOneAndUpdate({ id, type: 'new item' }, { status: 'available' }, { new: true });
+                    if (!products) {
+                        return res.status(200).json({
                             status: false,
-                            code: 404,
-                            message: "Order not found",
+                            message: "Order do not exist or have already been deleted",
+                            code: 201,
                         });
                     }
-                    else {
-                        const updatedOrder = await this.Order.findByIdAndUpdate(req.params.orderId, req.body, { new: true });
-                        res.status(200).json({
-                            status: true,
-                            code: 200,
-                            message: "Order updated successfully",
-                            order: updatedOrder,
-                        });
-                    }
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "Order updated successfully",
+                        products,
+                    });
                 }
-                catch (error) {
-                    res.status(500).json({
-                        status: false,
+                catch {
+                    return res.status(200).json({
+                        status: true,
+                        message: "Unable to update Order",
                         code: 500,
-                        message: "Internal server error",
-                        error,
                     });
                 }
             }
 
-            run();
+            return run();
         }
     }
 
-    deleteOrder= () => {
-        /**
-         * @param {{ params: { orderId: any; }; }} req
-         * @param {{ status: (arg0: number) => { (): any; new (): any; json: { (arg0: { status: boolean; code: number; message: string; order?: any; error?: any; }): void; new (): any; }; }; }} res
-         */
+    getUserAvailableOrders = () => {
         return (req, res) => {
             const run = async () => {
                 try {
-                    const order = await this.Order.findById(req.params.orderId);
-                    if (!order) {
-                        res.status(404).json({
-                            status: false,
-                            code: 404,
-                            message: "Order not found",
-                        });
-                    }
-                    else {
-                        const deletedOrder = await this.Order.findByIdAndUpdate(req.params.orderId, { isDeleted: true }, { new: true });
-                        res.status(200).json({
-                            status: true,
-                            code: 200,
-                            message: "Order deleted successfully",
-                            order: deletedOrder,
-                        });
-                    }
-                }
-                catch (error) {
-                    res.status(500).json({
+                    const { userId } = req.params;
+                    const products = await this.Order.find({ user: userId, status: 'available', type: 'new item' });
+                    return res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "Orders fetched successfully",
+                        products
+                    });
+                } catch (error) {
+                    return res.status(500).json({
                         status: false,
                         code: 500,
-                        message: "Internal server error",
-                        error,
+                        message: "Internal Server Error",
                     });
                 }
             }
 
-            run();
+            return run();
         }
     }
 }

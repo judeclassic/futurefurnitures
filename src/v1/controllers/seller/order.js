@@ -187,13 +187,13 @@ export default class OrderController {
                 try{
                     const { id } = req.params;
                     
-                    const products = await this.Order.findOneAndUpdate({id, type: 'used item',}, req.body, { new: true });
-                    this.EmailHandler.sendSellerEmail({products});
+                    const orders = await this.Order.findOneAndUpdate({id, type: 'used item',}, req.body, { new: true });
+                    this.EmailHandler.sendSellerEmail({orders});
                     return res.status(200).json({
                         status: true,
                         code: 200,
                         message: 'Order updated successfully',
-                        product: products,
+                        order: orders,
                     });
                 } catch (error) {
                     return res.status(500).json({

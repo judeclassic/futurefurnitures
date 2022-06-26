@@ -74,8 +74,15 @@ const User= mongoose.model("User", mongoose.Schema({
     required: true,
   },
   cart: [{
-    type: mongoose.Schema.ObjectId,
-    ref: "Product",
+    productId: {
+      type: mongoose.Schema.ObjectId,
+      ref: "Product"},
+    color: {
+      type: String
+    },
+    quantity: {
+      type: Number
+    }
   }],
   savedProducts: [{
     type: mongoose.Schema.ObjectId,
@@ -139,13 +146,13 @@ const User= mongoose.model("User", mongoose.Schema({
     exp: {
         type: String
     },
-    paypal: [{
-      email: String,
-    }],
-    payoneer: [{
-      email: String,
+  }],
+  paypal: [{
+    email: String,
+  }],
+  payoneer: [{
+    email: String,
   }]
-}],
 }));
 
 export default User;
