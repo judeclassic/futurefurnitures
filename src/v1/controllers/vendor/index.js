@@ -488,7 +488,7 @@ export default class VendorController extends ServiceController {
                             id: vendor._id,
                             role: vendor.role,
                         }, USER_ACCESS_TOKEN_SECRET, {
-                            expiresIn: "1h",
+                            // expiresIn: "1h",
                         });
                         return res.status(200).json({
                             status: true,
@@ -542,7 +542,7 @@ export default class VendorController extends ServiceController {
                         state,
                         city,
                         description,
-                    });
+                    }, { new: true });
                     if (updatedVendor) {
                         return res.status(200).json({
                             status: true,
@@ -584,7 +584,6 @@ export default class VendorController extends ServiceController {
                 const { id } = req.body;
                 var image = req.files && req.files.crew_image ? req.files.crew_image.map(file => file.imagePath) : [];
                 var license = req.files && req.files.license ? req.files.license.map(file => file.lisencePath) : [];
-                console.log(license)
 
                 const vendor = await this.vendor.findById(id);
                 if (!vendor) {
@@ -597,7 +596,7 @@ export default class VendorController extends ServiceController {
                 const updatedVendor = await this.vendor.findByIdAndUpdate(id, {
                     image: [...vendor.image, ...image],
                     license: [...vendor.license, ...license],
-                });
+                }, { new: true });
                 if (updatedVendor) {
                     return res.status(200).json({
                         status: true,
@@ -645,7 +644,7 @@ export default class VendorController extends ServiceController {
                 const updatedVendor = await this.vendor.findByIdAndUpdate(id, {
                     isVerified,
                     status,
-                });
+                }, { new: true });
                 if (updatedVendor) {
                     return res.status(200).json({
                         status: true,  
@@ -860,7 +859,7 @@ export default class VendorController extends ServiceController {
                 }
                 const updatedVendor = await this.vendor.findByIdAndUpdate(id, {
                     profilePic
-                });
+                }, { new: true });
                 if (updatedVendor) {
                     return res.status(200).json({
                         status: true,
@@ -916,7 +915,7 @@ export default class VendorController extends ServiceController {
                 const password = await this.bcrypt.hash(newPassword, 10);
                 const updatedVendor = await this.vendor.findByIdAndUpdate(id, {
                     password,
-                }); 
+                }, { new: true }); 
                 if (updatedVendor) {
                     return res.status(200).json({
                         status: true,
@@ -971,7 +970,7 @@ export default class VendorController extends ServiceController {
                 }
                 const updatedVendor = await this.vendor.findByIdAndUpdate(id, {
                     email,
-                });
+                }, { new: true });
                 if (updatedVendor) {
                     return res.status(200).json({
                         status: true,
@@ -1026,7 +1025,7 @@ export default class VendorController extends ServiceController {
                 }
                 const updatedVendor = await this.vendor.findByIdAndUpdate(id, {
                     phone,
-                });
+                }, { new: true });
                 if (updatedVendor) {
                     return res.status(200).json({
                         status: true,
@@ -1072,7 +1071,7 @@ export default class VendorController extends ServiceController {
                 }
                 const updatedVendor = await this.vendor.findByIdAndUpdate(id, {
                     country,
-                });
+                }, { new: true });
                 if (updatedVendor) {
                     return res.status(200).json({
                         status: true,
@@ -1118,7 +1117,7 @@ export default class VendorController extends ServiceController {
                 }
                 const updatedVendor = await this.vendor.findByIdAndUpdate(id, {
                     city,
-                });
+                }, { new: true });
                 if (updatedVendor) {
                     return res.status(200).json({
                         status: true,
@@ -1164,7 +1163,7 @@ export default class VendorController extends ServiceController {
                 }
                 const updatedVendor = await this.vendor.findByIdAndUpdate(id, {
                     state,
-                });
+                }, { new: true });
                 if (updatedVendor) {
                     return res.status(200).json({
                         status: true,
@@ -1210,7 +1209,7 @@ export default class VendorController extends ServiceController {
                 }
                 const updatedVendor = await this.vendor.findByIdAndUpdate(id, {
                     primaryService,
-                });
+                }, { new: true });
                 if (updatedVendor) {
                     return res.status(200).json({
                         status: true,
@@ -1256,7 +1255,7 @@ export default class VendorController extends ServiceController {
                 }
                 const updatedVendor = await this.vendor.findByIdAndUpdate(id, {
                     place_of_training,
-                });
+                }, { new: true });
                 if (updatedVendor) {
                     return res.status(200).json({
                         status: true,
@@ -1302,7 +1301,7 @@ export default class VendorController extends ServiceController {
                 }
                 const updatedVendor = await this.vendor.findByIdAndUpdate(id, {
                     description,
-                });
+                }, { new: true });
                 if (updatedVendor) {
                     return res.status(200).json({
                         status: true,
@@ -1348,7 +1347,7 @@ export default class VendorController extends ServiceController {
                 }
                 const updatedVendor = await this.vendor.findByIdAndUpdate(id, {
                     years_of_experience,
-                });
+                }, { new: true });
                 if (updatedVendor) {
                     return res.status(200).json({
                         status: true,
@@ -1394,7 +1393,7 @@ export default class VendorController extends ServiceController {
                 }
                 const updatedVendor = await this.vendor.findByIdAndUpdate(id, {
                     crew_size,
-                });
+                }, { new: true });
                 if (updatedVendor) {
                     return res.status(200).json({
                         status: true,
@@ -1460,7 +1459,7 @@ export default class VendorController extends ServiceController {
                             exp
                         }
                     }
-                });
+                }, { new: true });
                 if (updatedVendor) {
                     return res.status(200).json({
                         status: true,
@@ -1606,7 +1605,7 @@ export default class VendorController extends ServiceController {
                             id: req.body.cardId
                         }
                     }
-                });
+                }, { new: true });
                 if (updatedVendor) {
                     return res.status(200).json({
                         status: true,
@@ -1656,7 +1655,7 @@ export default class VendorController extends ServiceController {
                             email,
                         }
                     }
-                });
+                }, { new: true });
                 if (updatedVendor) {
                     return res.status(200).json({
                         status: true,
@@ -1748,7 +1747,7 @@ export default class VendorController extends ServiceController {
                             id: req.body.paypalId
                         }
                     }
-                });
+                }, { new: true });
 
                 if (updatedVendor) {
                     return res.status(200).json({
@@ -1799,7 +1798,7 @@ export default class VendorController extends ServiceController {
                             email,
                         }
                     }
-                });
+                }, { new: true });
                 if (updatedVendor) {
                     return res.status(200).json({
                         status: true,
@@ -1891,7 +1890,7 @@ export default class VendorController extends ServiceController {
                             id: req.body.payoneerId
                         }
                     }
-                });
+                }, { new: true });
 
                 if (updatedVendor) {
                     return res.status(200).json({
@@ -1946,7 +1945,7 @@ export default class VendorController extends ServiceController {
                 }
                 const updatedVendor = await this.vendor.findByIdAndUpdate(id, {
                     isActive: false,
-                });
+                }, { new: true });
                 if (updatedVendor) {
                     return res.status(200).json({
                         status: true,
@@ -2093,7 +2092,7 @@ export default class VendorController extends ServiceController {
                 const { id } = req.user;
                 const vendor = await this.vendor.findByIdAndUpdate(id, req.body, {
                     new: true,
-                });
+                }, { new: true });
                 if (vendor) {
                     return res.status(200).json({
                         status: true,

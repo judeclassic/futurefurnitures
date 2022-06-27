@@ -905,9 +905,9 @@ export default class UserController {
                             await data.cart.map(async (item) => {
                                 var product = await this.Product.findById(item.productId);
                                 if (!product) return;
-                                
+
                                 if (product.variants) {
-                                    var variant = product.variants.find((v)=> v.color === item.color)
+                                    var variant = product.variants.find((v)=> v.color === item.color);
                                     product = { 
                                         ...product._doc,
                                         quantity: item.quantity,
