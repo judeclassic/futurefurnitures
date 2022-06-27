@@ -905,14 +905,23 @@ export default class UserController {
                             await data.cart.map(async (item) => {
                                 var product = await this.Product.findById(item.productId);
                                 console.log(product);
-                                var variant = product.variants.find((v)=> v.color === item.color)
-                                product = { 
-                                    ...product._doc,
-                                    quantity: item.quantity,
-                                    color: item.color,
-                                    variants: undefined,
-                                    variant,
-                                    price: variant.price
+                                if (product.variants) {
+                                    var variant = product.variants.find((v)=> v.color === item.color)
+                                    product = { 
+                                        ...product._doc,
+                                        quantity: item.quantity,
+                                        color: item.color,
+                                        variants: undefined,
+                                        variant,
+                                        price: variant.price
+                                    }
+                                } else {
+                                    product = { 
+                                        ...product._doc,
+                                        quantity: item.quantity,
+                                        color: item.color,
+                                        variants: undefined,
+                                    }
                                 }
                                 numb = numb + 1;
 
@@ -958,10 +967,12 @@ export default class UserController {
             try {
                 this.User.findByIdAndUpdate(req.user.id, {
                     $push: {
-                        savedProducts: req.params.productId,
+                        savedProducts: {
+                            productId: req.params.productId},
                     },
                     $pull: {
-                        cart: req.params.productId,
+                        cart: {
+                            productId: req.params.productId},
                     },
                 }, (err, data) => {
                     if (!err) {
@@ -996,10 +1007,12 @@ export default class UserController {
             try {
                 this.User.findByIdAndUpdate(req.user.id, {
                     $push: {
-                        cart: req.params.productId,
+                        cart: {
+                            productId: req.params.productId},
                     },
                     $pull: {
-                        savedProducts: req.params.productId,
+                        savedProducts: {
+                            productId: req.params.productId},
                     },
                 }, (err, data) => {
                     if (!err) {
