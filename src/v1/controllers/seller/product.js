@@ -18,6 +18,7 @@ export default class ProductController extends OrderController {
         return (req, res) => {
             const run = async () => {
                 const image = req.files && req.files.map(file => file.imagePath);
+                const sellerId = req.user.id
                 try{
                     const {
                         name,
@@ -49,7 +50,7 @@ export default class ProductController extends OrderController {
                         size,
                         dimensions,
                         weight,
-                        seller: seller && seller.trim(),
+                        seller: sellerId,
                         location,
                         currectPrice,
                         quantity,
