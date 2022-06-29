@@ -49,7 +49,7 @@ export default class ProductController extends OrderController {
                         size,
                         dimensions,
                         weight,
-                        seller,
+                        seller: seller && seller.trim(),
                         location,
                         currectPrice,
                         quantity,
@@ -432,7 +432,8 @@ export default class ProductController extends OrderController {
                 console.log('yeah');
                 try {
                     const { sellerId } = req.params;
-                    const products = await this.Product.find({ seller: sellerId, status: 'active' });
+                    console.log(sellerId)
+                    const products = await this.Product.find({ seller: sellerId , status: 'active' });
                     return res.status(200).json({
                         status: true,
                         code: 200,
@@ -448,6 +449,8 @@ export default class ProductController extends OrderController {
                     });
                 }
             }
+
+            run();
         }
     }
 

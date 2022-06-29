@@ -1,6 +1,7 @@
 //@ts-check
 
 
+// @ts-ignore
 const USER_ACCESS_TOKEN_SECRET = process.env.USER_ACCESS_TOKEN_SECRET || 'rirriurh849g498gyh4iggntfjnvo7';
 
 class ServiceController {
@@ -1215,7 +1216,7 @@ export default class VendorController extends ServiceController {
                         status: true,
                         code: 200,
                         message: "Vendor primary Service updated successfully",
-                        vendor: {...updatedVendor._doc, password: undefined},
+                        vendor: { ...updatedVendor._doc, password: undefined },
                     });
                 } else {
                     return res.status(403).json({

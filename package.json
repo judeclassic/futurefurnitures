@@ -27,6 +27,7 @@
     "nodemailer": "^6.7.5"
   },
   "devDependencies": {
+    "@types/node": "^18.0.0",
     "nodemon": "^2.0.15"
   },
   "_moduleAliases": {
