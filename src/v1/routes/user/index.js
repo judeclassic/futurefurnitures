@@ -51,7 +51,7 @@ const router = ({ Router, UserController, User, SellerProduct, Authenticate, Ema
     router.post( "/cart",  verifyUserToken(), userController.saveProductInCart() );
 
     // Remove From Cart
-    router.delete( "/cart/:productId", verifyUserToken(),  userController.removeProductFromCart() );
+    router.delete( "/cart/", verifyUserToken(),  userController.removeProductFromCart() );
 
     // Get Saved Products
     router.get( "/savedProducts", verifyUserToken(), userController.getSavedProducts() );

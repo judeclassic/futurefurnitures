@@ -779,7 +779,7 @@ export default class UserController {
                                 quantity
                             }
                         },
-                    }, (err, data) => {
+                    }, {new: true}, (err, data) => {
                         if (!err) {
                             res.status(200).json({
                                 status: true,
@@ -849,37 +849,43 @@ export default class UserController {
     // Remove Product from Cart
     removeProductFromCart = () => {
         return (req, res) => {
-            try {
-                this.User.findByIdAndUpdate(req.user.id, {
-                    $pull: {
-                        cart: req.params.productId,
-                    },
-                }, (err, data) => {
-                    if (!err) {
-                        res.status(200).json({
-                            status: true,
-                            code: 200,
-                            message: "Product removed from cart successfully",
-                            user: data,
-                        });
-                    } else {
-                        console.log(err);
-                        res.status(500).json({
+            const run = async () => {
+                try {
+                    const user = await this.User.findById(req.user.id);
+                    
+                    if (!user) {
+                        res.status(403).json({
                             status: false,
-                            code: 500,
+                            code: 403,
                             message: "Product not removed from cart",
                         });
                     }
-                });
-            } catch (err) {
-                console.log(err);
-                res.status(500).json({
-                    status: false,
-                    code: 500,
-                    message: "Product not removed from cart",
-                    error: err
-                });
+
+                    const { productId, color } = req.body;
+
+                    let cart = user.cart.filter((c)=> !(c.productId.toString() === productId && c.color === color) );
+                    console.log(cart)
+                    user.cart = cart;
+                    await user.save();
+
+                    res.status(200).json({
+                        status: true,
+                        code: 200,
+                        message: "Product removed from cart successfully",
+                        cart: user.cart,
+                    });
+                } catch (err) {
+                    console.log(err);
+                    res.status(403).json({
+                        status: false,
+                        code: 403,
+                        message: "Product not removed from cart",
+                        error: err
+                    });
+                }
             }
+
+            run();
         }
     }
 
