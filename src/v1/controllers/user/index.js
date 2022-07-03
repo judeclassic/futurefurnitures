@@ -920,6 +920,7 @@ export default class UserController {
                                         color: item.color,
                                         variants: undefined,
                                         variant,
+                                        image: variant.image[0],
                                         price: variant.price
                                     }
                                 } else {
