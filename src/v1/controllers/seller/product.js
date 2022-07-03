@@ -17,6 +17,7 @@ export default class ProductController extends OrderController {
     createProduct = () => {
         return (req, res) => {
             const run = async () => {
+                console.log(req.body);
                 const image = req.files && req.files.map(file => file.imagePath);
                 const sellerId = req.user.id
                 try{
@@ -73,11 +74,11 @@ export default class ProductController extends OrderController {
                         products,
                     });
                 } catch (error) {
-                    // console.log(error);
-                    return res.status(500).json({
+                    console.log(error);
+                    return res.status(403).json({
                         status: false,
                         code: 403,
-                        message: error.message,
+                        message: error,
                     });
                 }
             }
