@@ -19,6 +19,7 @@ export default class ProductController extends OrderController {
             const run = async () => {
                 console.log(req.body);
                 const image = req.files && req.files.map(file => file.imagePath);
+                console.log(image);
                 const sellerId = req.user.id
                 try{
                     const {
